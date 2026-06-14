@@ -25,9 +25,11 @@ function isBotAdmin(id) {
 function randDelay() { return 3500 + Math.random() * 1500; } // 3.5–5 ثانية
 
 // ── Global state ──────────────────────────────────────────────────────────────
-if (!global._nickLocks)   global._nickLocks   = {}; // tid → { active, globalName, perUser:{uid:name} }
-if (!global._nickQueue)   global._nickQueue   = {}; // tid → قيد التطبيق
+if (!global._nickLocks)     global._nickLocks     = {}; // tid → { active, globalName, perUser:{uid:name} }
+if (!global._nickQueue)     global._nickQueue     = {}; // tid → قيد التطبيق
 if (!global._nickRestoring) global._nickRestoring = {}; // tid:uid → true (منع التكرار)
+if (!global._nickTimers)    global._nickTimers    = {}; // tid → intervalID للمراقبة الدورية
+if (!global._nickAPI)       global._nickAPI       = null; // مرجع الـ API للمؤقتات
 
 // ── استعادة من الملف ──────────────────────────────────────────────────────────
 function restoreAll() {
@@ -86,11 +88,15 @@ module.exports = {
     const tid = String(event.threadID);
     const sub = (args[0] || "").toLowerCase();
 
+    global._nickAPI = api; // حفظ الـ API للمؤقتات الدورية
+
     // ── off ───────────────────────────────────────────────────────────────────
     if (sub === "off" || sub === "إيقاف") {
       if (global._nickLocks[tid]) global._nickLocks[tid].active = false;
       const d = load(); if (d[tid]) { d[tid].active = false; save(d); }
-      return message.reply("✅ تم إيقاف قفل الكنيات.");
+      // إيقاف المؤقت الدوري
+      if (global._nickTimers[tid]) { clearInterval(global._nickTimers[tid]); delete global._nickTimers[tid]; }
+      return message.reply("✅ تم إيقاف قفل الكنيات والمراقبة الدورية.");
     }
 
     // ── status ────────────────────────────────────────────────────────────────
@@ -130,8 +136,9 @@ module.exports = {
       global._nickLocks[tid].perUser[uid] = name;
       global._nickLocks[tid].active = true;
       const d = load(); d[tid] = global._nickLocks[tid]; save(d);
+      _startNickTimer(tid); // بدء المراقبة الدورية
       await applyNick(api, tid, uid, name);
-      return message.reply(`✅ تم قفل كنية ${uid} على "${name}"`);
+      return message.reply(`✅ تم قفل كنية ${uid} على "${name}" مع المراقبة الدورية`);
     }
 
     // ── [name] — قفل عام ──────────────────────────────────────────────────────
@@ -144,16 +151,27 @@ module.exports = {
       perUser: global._nickLocks[tid]?.perUser || {}
     };
     const d = load(); d[tid] = global._nickLocks[tid]; save(d);
+    _startNickTimer(tid); // بدء المراقبة الدورية
 
-    message.reply(`🔒 تم تفعيل قفل الكنيات\n📝 الاسم: "${name}"\n⏱ تأخير 3.5–5s بين كل كنية\n👁 يراقب أي تغيير ويعيده`);
+    message.reply(`🔒 تم تفعيل قفل الكنيات\n📝 الاسم: "${name}"\n⏱ تأخير 3.5–5s بين كل كنية\n👁 مراقبة فورية عند التغيير\n🔄 إعادة تطبيق تلقائي كل 8 دقائق`);
     applyAll(api, tid).catch(() => {});
   },
 
   // ── onEvent: مراقبة تغييرات الكنيات ──────────────────────────────────────────
   onEvent: async function({ api, event }) {
-    if (event.logMessageType !== "log:user-nickname") return;
-    const tid    = String(event.threadID);
-    const lock   = global._nickLocks[tid];
+    global._nickAPI = api; // تحديث مرجع الـ API دائماً
+
+    // كشف حدث تغيير الكنية — دعم صيغ متعددة من مكتبة fca
+    const isNickChange =
+      event.logMessageType === "log:user-nickname" ||
+      event.type          === "log:user-nickname" ||
+      (event.logMessageData?.participant_id !== undefined &&
+       event.logMessageData?.nickname       !== undefined);
+
+    if (!isNickChange) return;
+
+    const tid  = String(event.threadID);
+    const lock = global._nickLocks[tid];
     if (!lock?.active) return;
 
     // من الذي غيّر الكنية؟
@@ -161,14 +179,35 @@ module.exports = {
     if (isBotAdmin(changerID)) return; // أدمن البوت مسموح له
 
     // الشخص الذي تغيّرت كنيته
-    const targetID = String(event.logMessageData?.participant_id || event.logMessageData?.userId || "");
+    const targetID = String(
+      event.logMessageData?.participant_id ||
+      event.logMessageData?.userId ||
+      event.logMessageData?.subjectFbId || ""
+    );
     if (!targetID) return;
 
     // الكنية المطلوبة
     const locked = lock.perUser?.[targetID] ?? lock.globalName;
     if (!locked) return;
 
-    // أعِد الكنية بعد 500ms
-    setTimeout(() => applyNick(api, tid, targetID, locked), 500);
+    // أعِد الكنية بعد 800ms (تجنب تعارض مع الحدث نفسه)
+    setTimeout(() => applyNick(api, tid, targetID, locked), 800);
   }
 };
+
+// ── مؤقت المراقبة الدورية (8 دقائق) ─────────────────────────────────────────
+function _startNickTimer(tid) {
+  if (global._nickTimers[tid]) clearInterval(global._nickTimers[tid]);
+  global._nickTimers[tid] = setInterval(async () => {
+    const lock = global._nickLocks[tid];
+    if (!lock?.active) {
+      clearInterval(global._nickTimers[tid]);
+      delete global._nickTimers[tid];
+      return;
+    }
+    const api = global._nickAPI;
+    if (!api) return;
+    // إعادة تطبيق جميع الكنيات بهدوء
+    await applyAll(api, tid).catch(() => {});
+  }, 8 * 60 * 1000); // كل 8 دقائق
+}

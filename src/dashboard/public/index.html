@@ -629,12 +629,21 @@ textarea.code{min-height:320px;font-family:'SF Mono','Fira Code',Consolas,monosp
 .gip-member-info{flex:1;min-width:0;}
 .gip-member-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .gip-member-nick{font-size:10px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.gip-member-actions{display:flex;gap:4px;}
+.gip-member-actions{display:flex;gap:3px;}
 .gip-action-btn{
   background:none;border:none;cursor:pointer;font-size:13px;
   padding:3px 5px;border-radius:6px;transition:all .15s;
 }
 .gip-action-btn:hover{background:rgba(255,255,255,.1);}
+.gip-profile-btn:hover{background:rgba(10,132,255,.18);}
+.gip-nick-btn:hover{background:rgba(191,90,242,.18);}
+.gip-kick-btn:hover{background:rgba(255,69,58,.18);}
+.gip-uid-copy{
+  font-size:9px;color:var(--t3);font-family:'SF Mono',monospace;
+  cursor:pointer;user-select:all;transition:color .15s;
+  margin-top:1px;letter-spacing:.2px;
+}
+.gip-uid-copy:hover{color:var(--blue);}
 
 /* ════ COMMAND CARDS ════ */
 .search-bar{display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap;}
@@ -1398,34 +1407,43 @@ input:checked+.slider::before{transform:translateX(21px);}
   <div class="tab-pane" id="tab-settings">
 
     <!-- APK Download Card -->
-    <div class="card" style="background:linear-gradient(135deg,rgba(10,132,255,.12),rgba(191,90,242,.12));border:1px solid rgba(10,132,255,.3);">
+    <div class="card" style="background:linear-gradient(135deg,rgba(10,132,255,.12),rgba(191,90,242,.12));border:1px solid rgba(10,132,255,.3);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:10px;left:14px;background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.5px;">v5.0 جديد</div>
       <div class="card-title">📱 تطبيق Android — DAVID V1</div>
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
         <div style="flex:1;min-width:200px;">
-          <p style="font-size:13px;color:var(--t2);margin:0 0 6px 0;">التطبيق الأصلي للتحكم الكامل في البوت من هاتفك</p>
-          <ul style="font-size:11px;color:var(--t3);margin:0;padding-right:16px;line-height:1.8;">
-            <li>مسنجر حي مع إشعارات</li>
-            <li>لوحة تحكم كاملة</li>
-            <li>يعمل مع Railway وTermux</li>
+          <p style="font-size:13px;color:var(--t2);margin:0 0 8px 0;">التطبيق الأصلي للتحكم الكامل في البوت من هاتفك</p>
+          <ul style="font-size:11px;color:var(--t3);margin:0;padding-right:16px;line-height:2;">
+            <li>🔘 بطاقة حالة البوت مع فحص الاتصال وزمن الاستجابة</li>
+            <li>⚡ تنقل سريع بين التابات بضغطة واحدة</li>
+            <li>📋 نسخ الرابط من الـ Drawer مباشرة</li>
+            <li>💬 مسنجر حي مع إشعارات وأسماء الغروبات</li>
+            <li>🚀 يعمل مع Railway وTermux وكل الاستضافات</li>
           </ul>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;min-width:180px;">
           <a href="https://github.com/castrolmocro/divid-apk/releases/latest"
              target="_blank"
              class="btn btn-primary"
-             style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;">
-            ⬇️ تحميل APK (أحدث إصدار)
+             style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,var(--blue),var(--purple));box-shadow:0 6px 20px rgba(10,132,255,.45);">
+            ⬇️ تحميل APK v5.0
           </a>
           <a href="https://github.com/castrolmocro/divid-apk/releases"
              target="_blank"
              class="btn btn-ghost"
              style="text-align:center;text-decoration:none;font-size:11px;">
-            📋 كل الإصدارات
+            📋 كل الإصدارات السابقة
+          </a>
+          <a href="https://github.com/castrolmocro/divid-apk"
+             target="_blank"
+             class="btn btn-ghost"
+             style="text-align:center;text-decoration:none;font-size:11px;">
+            📂 الكود المصدري
           </a>
         </div>
       </div>
-      <div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;font-size:11px;color:var(--t3);">
-        💡 <b>بعد التثبيت:</b> افتح التطبيق ← اضغط الإعدادات ← أدخل رابط السيرفر وكلمة السر <code style="color:var(--blue)">david2025</code>
+      <div style="margin-top:14px;padding:10px 14px;background:rgba(255,255,255,.05);border-radius:10px;font-size:11px;color:var(--t3);border:1px solid rgba(255,255,255,.07);">
+        💡 <b style="color:var(--t2)">التثبيت:</b> حمّل الـ APK ← فعّل "تثبيت من مصادر غير معروفة" ← ثبّت ← أدخل رابط السيرفر وكلمة السر <code style="color:var(--blue);background:rgba(10,132,255,.1);padding:1px 5px;border-radius:4px;">david2025</code>
       </div>
     </div>
 
@@ -2549,12 +2567,15 @@ function renderChatMessages(msgs) {
         else if (a.url) content += `<div class="msg-attachment">📎 ${esc(a.filename||a.type||"ملف")}</div>`;
       });
     }
+    const fbUrl = m.senderID ? `https://www.facebook.com/${m.senderID}` : "#";
     return `${dateSep}<div class="msg-bubble-wrap ${isFromBot?"from-bot":""}">
-      ${!isFromBot ? `<div class="msg-avatar">${letter}</div>` : `<div class="msg-avatar" style="background:linear-gradient(135deg,var(--blue),var(--purple));overflow:hidden;"><img src="/angel.png" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML='D'"></div>`}
+      ${!isFromBot
+        ? `<a href="${fbUrl}" target="_blank" style="text-decoration:none;flex-shrink:0;"><div class="msg-avatar" title="${esc(m.senderName||m.senderID||"")}">${letter}</div></a>`
+        : `<div class="msg-avatar" style="background:linear-gradient(135deg,var(--blue),var(--purple));overflow:hidden;"><img src="/angel.png" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML='D'"></div>`}
       <div>
-        ${!isFromBot && m.senderName ? `<div class="msg-sender-name">${esc(m.senderName)}</div>` : ""}
+        ${!isFromBot && m.senderName ? `<div class="msg-sender-name"><a href="${fbUrl}" target="_blank" style="color:inherit;text-decoration:none;" title="فتح الملف الشخصي">${esc(m.senderName)}</a></div>` : ""}
         <div class="msg-bubble">${content}</div>
-        <div class="msg-time">${time}</div>
+        <div class="msg-time" title="${new Date(m.ts).toLocaleString('ar')}">${time}</div>
       </div>
     </div>`;
   }).join("");
@@ -2575,9 +2596,25 @@ function onMessengerMsg(msg) {
     _messengerThreads.sort((a,b) => (b.lastTs||0) - (a.lastTs||0));
     filterThreads();
   } else {
-    // New thread
-    _messengerThreads.unshift({ tid, name: `غروب ${tid}`, type: "group", lastBody: msg.body||"", lastTs: msg.ts });
+    // غروب جديد — أضفه فوراً باسم مؤقت ثم اجلب اسمه الحقيقي
+    _messengerThreads.unshift({ tid, name: `جاري التحميل…`, type: "group", lastBody: msg.body||"", lastTs: msg.ts });
     filterThreads();
+    // اجلب اسم الغروب من السيرفر
+    apiFetch(`/api/messenger/thread/${tid}/info`).then(r => {
+      if (!r.ok) {
+        const t2 = _messengerThreads.find(x => x.tid === tid);
+        if (t2 && t2.name === "جاري التحميل…") { t2.name = `غروب ${tid}`; filterThreads(); }
+        return;
+      }
+      const info = r.info || {};
+      const realName = info.threadName || info.name || `غروب ${tid}`;
+      const imgSrc   = info.imageSrc  || info.image || null;
+      const thr = _messengerThreads.find(x => x.tid === tid);
+      if (thr) { thr.name = realName; if (imgSrc) thr.imageSrc = imgSrc; filterThreads(); }
+    }).catch(() => {
+      const t2 = _messengerThreads.find(x => x.tid === tid);
+      if (t2 && t2.name === "جاري التحميل…") { t2.name = `غروب ${tid}`; filterThreads(); }
+    });
   }
 
   // If this thread is active, add message to chat
@@ -2623,17 +2660,18 @@ function appendChatMessage(msg) {
     });
   }
   if (!content) content = `<div class="msg-text" style="color:var(--t3);font-style:italic">[رسالة فارغة]</div>`;
+  const fbUrlA = msg.senderID ? `https://www.facebook.com/${msg.senderID}` : "#";
   const div = document.createElement("div");
   div.className = `msg-bubble-wrap ${isFromBot?"from-bot":""}`;
   div.style.animation = "msgIn .3s var(--spring)";
   div.innerHTML = `
     ${!isFromBot
-      ? `<div class="msg-avatar">${letter}</div>`
+      ? `<a href="${fbUrlA}" target="_blank" style="text-decoration:none;flex-shrink:0;"><div class="msg-avatar" title="${esc(msg.senderName||msg.senderID||"")}">${letter}</div></a>`
       : `<div class="msg-avatar" style="background:linear-gradient(135deg,var(--blue),var(--purple));overflow:hidden;"><img src="/angel.png" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML='D'"></div>`}
     <div>
-      ${!isFromBot && msg.senderName ? `<div class="msg-sender-name">${esc(msg.senderName)}</div>` : ""}
+      ${!isFromBot && msg.senderName ? `<div class="msg-sender-name"><a href="${fbUrlA}" target="_blank" style="color:inherit;text-decoration:none;" title="فتح الملف الشخصي">${esc(msg.senderName)}</a></div>` : ""}
       <div class="msg-bubble">${content}</div>
-      <div class="msg-time">${time}</div>
+      <div class="msg-time" title="${new Date(msg.ts).toLocaleString('ar')}">${time}</div>
     </div>`;
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
@@ -2857,16 +2895,24 @@ async function loadThreadInfo() {
         const nm = u.name || u.vanity || u.fullName || u.id || "مستخدم";
         const nick = info.nicknames?.[u.id] || "";
         const isAdmin = (info.adminIDs || []).some(a => String(a.id || a) === String(u.id));
-        return `<div class="gip-member">
-          <div class="gip-member-av">${nm[0]?.toUpperCase()||"?"}</div>
+        const fbLink = `https://www.facebook.com/${u.id}`;
+        const safeNm = esc(nm).replace(/'/g,"&#39;");
+        return `<div class="gip-member" data-uid="${u.id}">
+          <a href="${fbLink}" target="_blank" style="text-decoration:none;flex-shrink:0;" title="فتح الملف الشخصي">
+            <div class="gip-member-av" style="transition:all .2s;cursor:pointer;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">${nm[0]?.toUpperCase()||"?"}</div>
+          </a>
           <div class="gip-member-info">
-            <div class="gip-member-name">${esc(nm)} ${isAdmin ? '<span style="color:var(--yellow);font-size:10px">أدمن</span>' : ""}</div>
-            ${nick ? `<div class="gip-member-nick">${esc(nick)}</div>` : ""}
-            <div style="font-size:10px;color:var(--t3)">${u.id}</div>
+            <div class="gip-member-name">
+              <a href="${fbLink}" target="_blank" style="color:inherit;text-decoration:none;hover:underline">${esc(nm)}</a>
+              ${isAdmin ? ' <span style="color:var(--yellow);font-size:9px;background:rgba(255,214,10,.12);padding:1px 5px;border-radius:4px;">أدمن</span>' : ""}
+            </div>
+            ${nick ? `<div class="gip-member-nick">🏷 ${esc(nick)}</div>` : ""}
+            <div class="gip-uid-copy" onclick="navigator.clipboard.writeText('${u.id}').then(()=>toast('✅ تم نسخ الـ UID','success'))" title="نقر لنسخ الـ UID">${u.id} 📋</div>
           </div>
           <div class="gip-member-actions">
-            <button class="gip-action-btn" onclick="promptNickname('${u.id}','${esc(nm)}')" title="تغيير الكنية">✏️</button>
-            <button class="gip-action-btn" onclick="kickMember('${u.id}','${esc(nm)}')" title="إزالة">🚫</button>
+            <button class="gip-action-btn gip-profile-btn" onclick="window.open('${fbLink}','_blank')" title="فتح الملف الشخصي على فيسبوك">👤</button>
+            <button class="gip-action-btn gip-nick-btn" onclick="promptNickname('${u.id}','${safeNm}')" title="تغيير/قفل الكنية">✏️</button>
+            <button class="gip-action-btn gip-kick-btn" onclick="kickMember('${u.id}','${safeNm}')" title="إزالة من الغروب">🚫</button>
           </div>
         </div>`;
       }).join("");
