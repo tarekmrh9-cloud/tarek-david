@@ -139,6 +139,16 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "❌ فشل: " + error, Toast.LENGTH_LONG).show();
             });
         }
+
+        @JavascriptInterface
+        public void openRailwayHelp() {
+            new Handler(Looper.getMainLooper()).post(MainActivity.this::showRailwayDialog);
+        }
+
+        @JavascriptInterface
+        public void openPhoneHostHelp() {
+            new Handler(Looper.getMainLooper()).post(MainActivity.this::showPhoneAsHostDialog);
+        }
     }
 
     // ── Lifecycle ────────────────────────────────────────────────────────
@@ -497,10 +507,17 @@ public class MainActivity extends AppCompatActivity {
 
         addDivider(content);
 
-        // ── Phone as host ──
-        addSectionLabel(content, "الهاتف كسيرفر");
+        // ── Hosting Mode (Railway / Phone) ──
+        addSectionLabel(content, "🚀 نشر البوت");
 
-        LinearLayout hostBtn = makeActionBtn("📡  إعداد الهاتف كسيرفر", "#0A84FF");
+        LinearLayout railBtn = makeActionBtn("🚂  Railway — نشر على السحابة", "#6366F1");
+        railBtn.setOnClickListener(v -> {
+            drawerLayout.closeDrawer(drawerPanel);
+            showRailwayDialog();
+        });
+        content.addView(railBtn);
+
+        LinearLayout hostBtn = makeActionBtn("📱  الهاتف كسيرفر (محلي)", "#32D74B");
         hostBtn.setOnClickListener(v -> { drawerLayout.closeDrawer(drawerPanel); showPhoneAsHostDialog(); });
         content.addView(hostBtn);
 
@@ -812,6 +829,74 @@ public class MainActivity extends AppCompatActivity {
             .show();
     }
 
+    private void showRailwayDialog() {
+        ScrollView scroll = new ScrollView(this);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setBackgroundColor(Color.parseColor("#111111"));
+        layout.setPadding(dp(20), dp(16), dp(20), dp(28));
+        scroll.addView(layout);
+
+        String[][] steps = {
+            {"🚂 ما هو Railway؟",
+             "Railway هو خدمة استضافة سحابية مجانية تتيح تشغيل البوت 24/7 دون الحاجة لإبقاء الهاتف مفتوحاً."},
+            {"1️⃣  إنشاء حساب",
+             "اذهب إلى railway.app\nسجّل دخول عبر GitHub"},
+            {"2️⃣  رفع الكود على GitHub",
+             "من لوحة التحكم → تبويب Railway\nأدخل GitHub Token واضغط \"رفع على GitHub\""},
+            {"3️⃣  إنشاء مشروع جديد",
+             "في Railway: New Project → Deploy from GitHub Repo\nاختر: castrolmocro/divid-apk"},
+            {"4️⃣  إضافة المتغيرات",
+             "في Railway → Variables أضف:\nNODE_ENV=production\nPORT=3000\nDASHBOARD_PASSWORD=david2025"},
+            {"5️⃣  ضبط الرابط هنا",
+             "بعد النشر ستحصل على رابط مثل:\nhttps://your-project.railway.app\nأدخله في إعدادات التطبيق."},
+            {"💡 Railway مجاناً",
+             "يتيح Railway 500 ساعة مجانية شهرياً.\nراجع railway.app للخطط المدفوعة إذا احتجت أكثر."}
+        };
+
+        for (String[] step : steps) {
+            LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setBackground(makeRoundRect(dp(12), Color.parseColor("#1C1C1E")));
+            card.setPadding(dp(14), dp(12), dp(14), dp(12));
+            LinearLayout.LayoutParams cLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            cLp.bottomMargin = dp(10);
+            card.setLayoutParams(cLp);
+
+            TextView titleTv = new TextView(this);
+            titleTv.setText(step[0]);
+            titleTv.setTextSize(14);
+            titleTv.setTypeface(null, Typeface.BOLD);
+            titleTv.setTextColor(Color.parseColor("#6366F1"));
+            card.addView(titleTv);
+
+            TextView bodyTv = new TextView(this);
+            bodyTv.setText(step[1]);
+            bodyTv.setTextSize(13);
+            bodyTv.setTextColor(Color.parseColor("#EBEBF5"));
+            bodyTv.setLineSpacing(0, 1.4f);
+            LinearLayout.LayoutParams bLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            bLp.topMargin = dp(4);
+            bodyTv.setLayoutParams(bLp);
+            card.addView(bodyTv);
+            layout.addView(card);
+        }
+
+        new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            .setTitle("🚀 النشر على Railway")
+            .setView(scroll)
+            .setPositiveButton("⚙️ ضبط الرابط", (d, which) -> showSettingsDialog())
+            .setNeutralButton("🌐 فتح Railway", (d, which) -> {
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://railway.app")));
+                } catch (Exception ignored) {}
+            })
+            .setNegativeButton("إغلاق", null)
+            .show();
+    }
+
     private void showPhoneAsHostDialog() {
         ScrollView scroll = new ScrollView(this);
         LinearLayout layout = new LinearLayout(this);
@@ -947,28 +1032,52 @@ public class MainActivity extends AppCompatActivity {
     // ── Connection Error ──────────────────────────────────────────────────
     private void showConnectionError() {
         String url = getActiveUrl();
+        boolean isLocal = url.contains("localhost") || url.contains("127.0.0.1") || url.contains("192.168.");
         String html =
             "<html><head><meta charset='UTF-8'>" +
             "<meta name='viewport' content='width=device-width,initial-scale=1.0'>" +
-            "<style>*{box-sizing:border-box;margin:0;padding:0}" +
+            "<style>" +
+            "*{box-sizing:border-box;margin:0;padding:0}" +
             "body{background:#000;color:#fff;font-family:-apple-system,system-ui,sans-serif;" +
-            "display:flex;align-items:center;justify-content:center;min-height:100vh;" +
-            "flex-direction:column;gap:12px;padding:32px;text-align:center}" +
-            "h2{color:#FF453A;font-size:22px;font-weight:700}" +
-            "p{color:rgba(255,255,255,.6);font-size:14px;line-height:1.6}" +
-            "code{color:#0A84FF;background:rgba(10,132,255,.12);padding:3px 10px;border-radius:6px;font-size:12px}" +
-            "button{width:100%;max-width:300px;border:none;border-radius:14px;padding:14px;" +
-            "font-size:15px;font-weight:700;cursor:pointer;color:#fff;transition:opacity .15s;margin-top:4px}" +
-            "button:active{opacity:.65}" +
-            ".b1{background:#0A84FF}.b2{background:rgba(255,255,255,.1)}.b3{background:rgba(191,90,242,.25);color:#BF5AF2}" +
+            "min-height:100vh;display:flex;flex-direction:column;align-items:center;" +
+            "justify-content:center;gap:10px;padding:28px 20px;text-align:center}" +
+            "h2{color:#FF453A;font-size:20px;font-weight:800;margin-bottom:2px}" +
+            "p{color:rgba(255,255,255,.55);font-size:13px;line-height:1.6}" +
+            "code{color:#0A84FF;background:rgba(10,132,255,.12);padding:3px 10px;border-radius:8px;font-size:11px;display:inline-block;margin:4px 0;word-break:break-all;max-width:90%}" +
+            ".btn{width:100%;max-width:320px;border:none;border-radius:16px;padding:15px 20px;" +
+            "font-size:14px;font-weight:700;cursor:pointer;color:#fff;margin-top:4px;text-align:center}" +
+            ".btn:active{opacity:.65}" +
+            ".b-retry{background:linear-gradient(135deg,#0A84FF,#5AC8FA)}" +
+            ".b-settings{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1)}" +
+            ".b-railway{background:linear-gradient(135deg,#6366F1,#8B5CF6)}" +
+            ".b-phone{background:rgba(50,215,75,.15);border:1px solid rgba(50,215,75,.3);color:#32D74B}" +
+            ".b-drawer{background:rgba(191,90,242,.15);border:1px solid rgba(191,90,242,.3);color:#BF5AF2}" +
+            ".divider{width:40px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;margin:6px auto}" +
+            ".mode-hint{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);" +
+            "border-radius:16px;padding:14px 16px;width:100%;max-width:320px;margin-bottom:4px}" +
+            ".mode-hint-title{font-size:12px;font-weight:700;margin-bottom:6px;color:rgba(255,255,255,.7)}" +
+            ".mode-opt{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;color:rgba(255,255,255,.6)}" +
+            ".mode-opt:last-child{border-bottom:none}" +
+            ".mode-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}" +
+            ".d-rail{background:#6366F1}.d-phone{background:#32D74B}.d-replit{background:#0A84FF}" +
             "</style></head><body>" +
-            "<div style='font-size:58px'>📡</div>" +
+            "<div style='font-size:52px;margin-bottom:4px'>📡</div>" +
             "<h2>تعذّر الاتصال</h2>" +
-            "<p>الرابط الحالي:<br><code>" + url + "</code></p>" +
-            "<p>تأكد أن البوت يعمل<br>وأن الرابط صحيح</p>" +
-            "<button class='b1' onclick='location.reload()'>🔄 إعادة المحاولة</button>" +
-            "<button class='b2' onclick='Android.openSettings()'>⚙️ تغيير الرابط</button>" +
-            "<button class='b3' onclick='Android.openDrawer()'>☰ اختر بوتاً آخر</button>" +
+            "<p>لا يمكن الوصول إلى البوت على الرابط:<br><code>" + url + "</code></p>" +
+            "<div class='mode-hint'>" +
+            "<div class='mode-hint-title'>اختر وضع الاستضافة:</div>" +
+            "<div class='mode-opt'><div class='mode-dot d-rail'></div><span>Railway — بوت سحابي 24/7 عبر railway.app</span></div>" +
+            "<div class='mode-opt'><div class='mode-dot d-phone'></div><span>الهاتف — Termux محلي على نفس الجهاز</span></div>" +
+            "<div class='mode-opt'><div class='mode-dot d-replit'></div><span>Replit — تشغيل مباشر على Replit</span></div>" +
+            "</div>" +
+            "<button class='btn b-retry' onclick='location.reload()'>🔄 إعادة المحاولة</button>" +
+            "<button class='btn b-railway' onclick='Android.openRailwayHelp()'>🚂 كيفية النشر على Railway</button>" +
+            (isLocal ?
+            "<button class='btn b-phone' onclick='Android.openPhoneHostHelp()'>📱 إعداد الهاتف كسيرفر</button>" :
+            "<button class='btn b-phone' onclick='Android.openPhoneHostHelp()'>📱 استخدام الهاتف كسيرفر بدلاً</button>") +
+            "<div class='divider'></div>" +
+            "<button class='btn b-settings' onclick='Android.openSettings()'>⚙️ تغيير رابط السيرفر</button>" +
+            "<button class='btn b-drawer' onclick='Android.openDrawer()'>☰ اختر بوتاً آخر</button>" +
             "</body></html>";
         webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
     }
