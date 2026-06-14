@@ -1,3 +1,22 @@
+# 📱 DAVID V1 — Android APK
+
+<div align="center">
+
+## ⬇️ [تحميل APK مباشرةً — اضغط هنا](https://github.com/castrolmocro/divid-apk/releases/latest/download/david-v1.apk)
+
+[![Download](https://img.shields.io/badge/⬇️_تحميل_APK-latest-0A84FF?style=for-the-badge)](https://github.com/castrolmocro/divid-apk/releases/latest/download/david-v1.apk)
+
+</div>
+
+### خطوات التثبيت (OPPO K12S / ColorOS 16):
+1. **الإعدادات ← الأمان ← مصادر غير معروفة** (فعّل للمتصفح)
+2. اضغط رابط التحميل أعلاه
+3. افتح الملف من التنزيلات وثبّت
+4. شغّل ← ⚙️ أعلى اليمين ← أدخل رابط السيرفر
+5. كلمة السر: `david2025`
+
+---
+
 # DAVID V1 — DjamelBot Engine
 
 > **Copyright © 2025 DJAMEL — All rights reserved**

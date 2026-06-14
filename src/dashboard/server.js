@@ -606,6 +606,32 @@ function startDashboard(port = 5000) {
     });
   });
 
+  // ── Messenger: change bot nickname in ALL known threads ──────────────────────
+  app.post("/api/messenger/set-bot-nick-all", auth, async (req, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    const { nickname } = req.body;
+    if (typeof nickname === "undefined") return res.json({ ok: false, error: "nickname مطلوب" });
+    let botID;
+    try { botID = api.getCurrentUserID(); } catch (_) { botID = null; }
+    if (!botID) return res.json({ ok: false, error: "تعذر الحصول على ID البوت" });
+    const threads = [..._threadMsgs.keys()];
+    if (!threads.length) return res.json({ ok: false, error: "لا توجد غروبات مسجلة بعد" });
+    let success = 0, failed = 0;
+    for (const tid of threads) {
+      try {
+        await new Promise((resolve) => {
+          api.changeNickname(String(nickname), String(tid), String(botID), (err) => {
+            if (err) failed++; else success++;
+            resolve();
+          });
+        });
+        await new Promise(r => setTimeout(r, 200)); // small delay to avoid rate limit
+      } catch (_) { failed++; }
+    }
+    res.json({ ok: true, total: threads.length, success, failed });
+  });
+
   // ── Messenger: set thread image (base64) ─────────────────────────────────────
   app.post("/api/messenger/set-image", auth, async (req, res) => {
     const api = global.GoatBot?.fcaApi;
