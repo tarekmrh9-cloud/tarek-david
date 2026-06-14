@@ -679,6 +679,66 @@ function startDashboard(port = 5000) {
     });
   });
 
+  // ── Messenger: pending message requests ──────────────────────────────────────
+  app.get("/api/messenger/requests", auth, (_, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    try {
+      if (typeof api.getThreadList === "function") {
+        api.getThreadList(30, null, ["PENDING"], (err, threads) => {
+          if (err) return res.json({ ok: false, error: err.message });
+          const reqs = (threads || []).map(t => ({
+            tid:         String(t.threadID || t.id || ""),
+            name:        t.name || t.threadName || `طلب ${t.threadID || ""}`,
+            snippet:     t.snippet || t.lastMessage || "",
+            ts:          t.timestamp || t.lastMessageTimestamp || 0,
+            imageSrc:    t.imageSrc  || t.image || null,
+            participantCount: (t.participantIDs || []).length
+          }));
+          res.json({ ok: true, requests: reqs });
+        });
+      } else {
+        res.json({ ok: false, error: "getThreadList غير مدعوم في هذه النسخة" });
+      }
+    } catch (e) { res.json({ ok: false, error: e.message }); }
+  });
+
+  // ── Messenger: accept pending request ────────────────────────────────────────
+  app.post("/api/messenger/accept-request", auth, (req, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    const { threadID } = req.body;
+    if (!threadID) return res.json({ ok: false, error: "threadID مطلوب" });
+    // قبول الطلب عبر إرسال رسالة فارغة
+    api.sendMessage({ body: "" }, String(threadID), (err) => {
+      if (err) {
+        // محاولة بديلة
+        api.sendMessage("", String(threadID), (err2) => {
+          if (err2) return res.json({ ok: false, error: err2.message });
+          res.json({ ok: true });
+        });
+        return;
+      }
+      res.json({ ok: true });
+    });
+  });
+
+  // ── Messenger: ignore/delete pending request ─────────────────────────────────
+  app.post("/api/messenger/ignore-request", auth, (req, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    const { threadID } = req.body;
+    if (!threadID) return res.json({ ok: false, error: "threadID مطلوب" });
+    if (typeof api.deleteThread === "function") {
+      api.deleteThread(String(threadID), (err) => {
+        if (err) return res.json({ ok: false, error: err.message });
+        res.json({ ok: true });
+      });
+    } else {
+      res.json({ ok: false, error: "deleteThread غير مدعوم" });
+    }
+  });
+
   // ── File Browser ─────────────────────────────────────────────────────────────
   const ALLOWED_EXTS = new Set([".js",".json",".txt",".md",".html",".css",".env",".toml",".yml",".yaml"]);
   const SKIP_DIRS    = new Set(["node_modules",".git","android","mobile",".cache","dist","build"]);

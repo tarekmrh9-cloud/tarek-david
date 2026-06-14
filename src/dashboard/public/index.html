@@ -425,6 +425,48 @@ textarea.code{min-height:320px;font-family:'SF Mono','Fira Code',Consolas,monosp
   padding:0 4px;flex-shrink:0;
 }
 .thread-list-empty{text-align:center;padding:40px 20px;color:var(--t2);font-size:12px;}
+.sidebar-tab-btns{display:flex;gap:4px;}
+.sidebar-tab-btn{
+  padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);
+  color:var(--t2);transition:all .2s var(--spring);font-family:inherit;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;
+}
+.sidebar-tab-btn.active{background:rgba(191,90,242,.18);color:var(--purple);border-color:rgba(191,90,242,.3);}
+.sidebar-tab-btn:hover:not(.active){background:rgba(255,255,255,.1);color:var(--text);}
+.req-badge{
+  background:var(--orange);color:#000;font-size:9px;font-weight:800;
+  padding:1px 5px;border-radius:8px;min-width:16px;text-align:center;
+}
+.req-badge.hidden{display:none;}
+.req-item{
+  padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.05);
+  animation:msgIn .2s var(--spring);
+}
+.req-item-row{display:flex;align-items:flex-start;gap:10px;}
+.req-item-av{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--orange),var(--yellow));
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;color:#000;
+}
+.req-item-av img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
+.req-item-info{flex:1;min-width:0;}
+.req-item-name{font-size:13px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.req-item-snippet{font-size:11px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.req-item-actions{display:flex;gap:5px;margin-top:7px;}
+.req-accept-btn{
+  padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;
+  background:rgba(50,215,75,.18);color:var(--green);border:1px solid rgba(50,215,75,.3);
+  font-family:inherit;transition:all .15s;
+}
+.req-accept-btn:hover{background:rgba(50,215,75,.3);}
+.req-ignore-btn{
+  padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;
+  background:rgba(255,255,255,.06);color:var(--t2);border:1px solid rgba(255,255,255,.1);
+  font-family:inherit;transition:all .15s;
+}
+.req-ignore-btn:hover{background:rgba(255,69,58,.15);color:var(--red);border-color:rgba(255,69,58,.3);}
 
 /* ── Chat area ── */
 .messenger-chat{
@@ -1173,13 +1215,26 @@ input:checked+.slider::before{transform:translateX(21px);}
       <!-- Sidebar: Thread List -->
       <div class="messenger-sidebar" id="messengerSidebar">
         <div class="messenger-sidebar-hdr">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div class="messenger-sidebar-title">💬 الغروبات</div>
-            <button class="chat-hdr-btn" onclick="loadMessengerThreads()" title="تحديث">🔄</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div class="sidebar-tab-btns">
+              <button class="sidebar-tab-btn active" id="sideTabGroups" onclick="switchSidebarTab('groups')">💬 الغروبات</button>
+              <button class="sidebar-tab-btn" id="sideTabRequests" onclick="switchSidebarTab('requests')">
+                📬 الطلبات
+                <span class="req-badge hidden" id="reqBadge">0</span>
+              </button>
+            </div>
+            <button class="chat-hdr-btn" onclick="refreshSidebarTab()" title="تحديث">🔄</button>
           </div>
-          <input class="msg-search" type="text" id="threadSearch" placeholder="🔍 بحث…" oninput="filterThreads()">
+          <input class="msg-search" type="text" id="threadSearch" placeholder="🔍 بحث…" oninput="filterThreads()" style="display:block">
         </div>
-        <div class="thread-list" id="threadList">
+
+        <!-- Groups list -->
+        <div class="thread-list" id="threadList" style="display:flex;flex-direction:column;">
+          <div class="thread-list-empty">🔄 جاري التحميل…</div>
+        </div>
+
+        <!-- Requests list -->
+        <div class="thread-list hidden" id="requestList" style="display:none;flex-direction:column;">
           <div class="thread-list-empty">🔄 جاري التحميل…</div>
         </div>
       </div>
@@ -2457,7 +2512,121 @@ function renderThreadList(threads) {
 function filterThreads() {
   const q = (document.getElementById("threadSearch")?.value || "").toLowerCase();
   if (!q) { renderThreadList(_messengerThreads); return; }
-  renderThreadList(_messengerThreads.filter(t => t.name.toLowerCase().includes(q) || t.tid.includes(q)));
+  renderThreadList(_messengerThreads.filter(t => (t.name||"").toLowerCase().includes(q) || t.tid.includes(q)));
+}
+
+/* ── Sidebar Tabs (Threads / Requests) ─────────────────────────────────────── */
+let _activeSidebarTab = "groups";
+let _messengerRequests = [];
+
+function switchSidebarTab(tab) {
+  _activeSidebarTab = tab;
+  const isGroups = tab === "groups";
+  document.getElementById("sideTabGroups").classList.toggle("active", isGroups);
+  document.getElementById("sideTabRequests").classList.toggle("active", !isGroups);
+  document.getElementById("threadList").style.display    = isGroups ? "flex" : "none";
+  document.getElementById("requestList").style.display   = isGroups ? "none" : "flex";
+  document.getElementById("threadSearch").style.display  = isGroups ? "block" : "none";
+  if (!isGroups && !_messengerRequests.length) loadMessengerRequests();
+}
+
+function refreshSidebarTab() {
+  if (_activeSidebarTab === "groups") loadMessengerThreads();
+  else loadMessengerRequests();
+}
+
+async function loadMessengerRequests() {
+  const el = document.getElementById("requestList");
+  if (!el) return;
+  el.innerHTML = '<div class="thread-list-empty">🔄 جاري تحميل الطلبات…</div>';
+  const r = await apiFetch("/api/messenger/requests");
+  if (!r.ok) {
+    el.innerHTML = `<div class="thread-list-empty">❌ ${r.error||"خطأ في التحميل"}</div>`;
+    return;
+  }
+  _messengerRequests = r.requests || [];
+  renderRequestList(_messengerRequests);
+  // Update badge
+  const badge = document.getElementById("reqBadge");
+  if (badge) {
+    badge.textContent = _messengerRequests.length;
+    badge.classList.toggle("hidden", _messengerRequests.length === 0);
+  }
+}
+
+function renderRequestList(reqs) {
+  const el = document.getElementById("requestList"); if (!el) return;
+  if (!reqs.length) {
+    el.innerHTML = '<div class="thread-list-empty">📭 لا توجد طلبات معلّقة<br><span style="font-size:10px;opacity:.6;">ستظهر رسائل الطلبات هنا</span></div>';
+    return;
+  }
+  el.innerHTML = reqs.map(rq => {
+    const letter = (rq.name || "?")[0].toUpperCase();
+    const avatarHtml = rq.imageSrc
+      ? `<img src="${esc(rq.imageSrc)}" onerror="this.parentElement.textContent='${letter}'">`
+      : letter;
+    const safeNm = esc(rq.name||"طلب").replace(/'/g,"&#39;");
+    return `<div class="req-item" id="req-${rq.tid}">
+      <div class="req-item-row">
+        <div class="req-item-av">${avatarHtml}</div>
+        <div class="req-item-info">
+          <div class="req-item-name">${esc(rq.name||"طلب")}</div>
+          <div class="req-item-snippet">${esc((rq.snippet||"رسالة معلّقة").slice(0,40))}</div>
+        </div>
+      </div>
+      <div class="req-item-actions">
+        <button class="req-accept-btn" onclick="acceptRequest('${rq.tid}','${safeNm}',this)">✅ قبول</button>
+        <button class="req-ignore-btn" onclick="ignoreRequest('${rq.tid}',this)">🗑 تجاهل</button>
+        <button class="req-ignore-btn" onclick="openThread('${rq.tid}','${safeNm}')" style="color:var(--blue);border-color:rgba(10,132,255,.25)">👁 عرض</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function acceptRequest(tid, name, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = "⏳"; }
+  const r = await apiFetch("/api/messenger/accept-request", {
+    method: "POST", body: JSON.stringify({ threadID: tid })
+  });
+  if (r.ok) {
+    toast(`✅ تم قبول طلب ${name}`, "success");
+    // Remove from list
+    _messengerRequests = _messengerRequests.filter(x => x.tid !== tid);
+    const item = document.getElementById(`req-${tid}`);
+    if (item) item.remove();
+    // Update badge
+    const badge = document.getElementById("reqBadge");
+    if (badge) {
+      badge.textContent = _messengerRequests.length;
+      badge.classList.toggle("hidden", !_messengerRequests.length);
+    }
+    // Open the thread
+    setTimeout(() => openThread(tid, name), 800);
+  } else {
+    toast("❌ " + (r.error||"فشل قبول الطلب"), "error");
+    if (btn) { btn.disabled = false; btn.textContent = "✅ قبول"; }
+  }
+}
+
+async function ignoreRequest(tid, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = "⏳"; }
+  const r = await apiFetch("/api/messenger/ignore-request", {
+    method: "POST", body: JSON.stringify({ threadID: tid })
+  });
+  if (r.ok) {
+    toast("✅ تم تجاهل الطلب", "success");
+    _messengerRequests = _messengerRequests.filter(x => x.tid !== tid);
+    const item = document.getElementById(`req-${tid}`);
+    if (item) item.remove();
+    const badge = document.getElementById("reqBadge");
+    if (badge) {
+      badge.textContent = _messengerRequests.length;
+      badge.classList.toggle("hidden", !_messengerRequests.length);
+    }
+  } else {
+    toast("❌ " + (r.error||"فشل"), "error");
+    if (btn) { btn.disabled = false; btn.textContent = "🗑 تجاهل"; }
+  }
 }
 
 async function openThread(tid, name) {
