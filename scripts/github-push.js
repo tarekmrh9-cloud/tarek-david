@@ -48,7 +48,7 @@ const FILES = [
   "scripts/push-to-github.sh",
   "scripts/github-push.js",
   "Procfile",
-  "railway.json",
+  "railway.toml",
   "nixpacks.toml",
 ];
 

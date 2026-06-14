@@ -1,21 +1,8 @@
 [phases.setup]
-nixPkgs = [
-  "nodejs_20",
-  "python3",
-  "pkg-config",
-  "pixman",
-  "cairo",
-  "pango",
-  "libjpeg",
-  "libpng",
-  "giflib"
-]
+nixPkgs = ["nodejs_18"]
 
 [phases.install]
-cmds = [
-  "npm install --legacy-peer-deps --no-audit --prefer-offline",
-  "node scripts/fix-esm.js"
-]
+cmds = ["npm install --legacy-peer-deps"]
 
 [start]
 cmd = "node index.js"
