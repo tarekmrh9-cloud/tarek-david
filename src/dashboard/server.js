@@ -785,17 +785,83 @@ function startDashboard(port = 5000) {
     } catch (e) { res.json({ ok: false, error: e.message }); }
   });
 
-  // ── Claude AI — توليد الأوامر ──────────────────────────────────────────────────
+  // ── AI Multi-Provider (Anthropic → Groq → Pollinations.ai free) ──────────────
+
+  function _getAIProvider() {
+    if (process.env.ANTHROPIC_API_KEY) return "anthropic";
+    if (process.env.GROQ_API_KEY) return "groq";
+    return "free";
+  }
+
+  async function _callAI(systemPrompt, userMsg, history = [], maxTokens = 2000) {
+    const provider = _getAIProvider();
+    const msgs = [];
+    if (Array.isArray(history)) {
+      for (const h of history.slice(-8)) {
+        if (h.role && h.content) msgs.push({ role: h.role, content: String(h.content) });
+      }
+    }
+    msgs.push({ role: "user", content: userMsg });
+
+    if (provider === "anthropic") {
+      const Anthropic = require("@anthropic-ai/sdk");
+      const client = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+      const resp = await client.messages.create({
+        model: "claude-haiku-4-5",
+        max_tokens: maxTokens,
+        messages: msgs,
+        system: systemPrompt,
+      });
+      return { text: resp.content[0]?.text || "", provider: "anthropic" };
+    }
+
+    if (provider === "groq") {
+      const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "system", content: systemPrompt }, ...msgs],
+          max_tokens: maxTokens,
+          temperature: 0.7
+        })
+      });
+      if (!r.ok) throw new Error(`Groq: ${r.status} ${await r.text()}`);
+      const data = await r.json();
+      return { text: data.choices[0]?.message?.content || "", provider: "groq" };
+    }
+
+    // Free fallback: Pollinations.ai — no API key required
+    const polBody = JSON.stringify({
+      model: "openai-large",
+      messages: [{ role: "system", content: systemPrompt }, ...msgs],
+      stream: false,
+      private: true,
+      seed: Math.floor(Math.random() * 99999)
+    });
+    const polHeaders = { "Content-Type": "application/json" };
+    let r = await fetch("https://text.pollinations.ai/", { method: "POST", headers: polHeaders, body: polBody });
+    if (r.status === 429) {
+      // Rate limited — wait 4 seconds and retry once
+      await new Promise(res => setTimeout(res, 4000));
+      r = await fetch("https://text.pollinations.ai/", { method: "POST", headers: polHeaders, body: polBody });
+    }
+    if (r.status === 429) throw new Error("rate_limit");
+    if (!r.ok) throw new Error(`Pollinations: ${r.status}`);
+    const text = await r.text();
+    return { text: text.trim(), provider: "free" };
+  }
+
+  app.get("/api/ai/provider", auth, (req, res) => {
+    const p = _getAIProvider();
+    const names = { anthropic: "Claude (Anthropic)", groq: "Llama 3.3 (Groq Free)", free: "GPT-4o (Pollinations — مجاني بدون key)" };
+    res.json({ ok: true, provider: p, name: names[p] });
+  });
+
   app.post("/api/ai/generate", auth, async (req, res) => {
     try {
       const { description, contextFiles } = req.body;
       if (!description) return res.json({ ok: false, error: "الوصف مطلوب" });
-
-      const apiKey = process.env.ANTHROPIC_API_KEY;
-      if (!apiKey) return res.json({ ok: false, error: "ANTHROPIC_API_KEY غير مُعيَّن — أضفه من الإعدادات" });
-
-      const Anthropic = require("@anthropic-ai/sdk");
-      const client = new Anthropic.default({ apiKey });
 
       // قراءة ملفات السياق
       let contextContent = "";
@@ -811,7 +877,6 @@ function startDashboard(port = 5000) {
         }
       }
 
-      // قراءة مثال أمر للسياق
       const exampleCmd = path.join(CMDS_DIR, "uptime.js");
       let exampleContent = "";
       try { exampleContent = fs.readFileSync(exampleCmd, "utf8"); } catch (_) {}
@@ -828,13 +893,12 @@ module.exports = {
     version: "1.0",
     author: "DJAMEL",
     countDown: 5,
-    role: 0,  // 0=الجميع 2=أدمن 3=مالك
-    category: "fun",  // fun/management/media/info/utility
+    role: 0,
+    category: "fun",
     description: "وصف مختصر",
     guide: { en: "{pn} [نص]" }
   },
   onStart: async function({ api, event, args, message, prefix }) {
-    // الكود هنا
     // message.reply("رسالة") لإرسال ردّ
     // api.sendMessage("نص", event.threadID) لإرسال رسالة
     // message.react("✅", event.messageID) لإضافة ردّ فعل
@@ -842,33 +906,20 @@ module.exports = {
 };
 \`\`\`
 
-متغيرات مفيدة في البوت:
-- global.GoatBot.config: إعدادات البوت
-- event.senderID: معرّف المرسل
-- event.threadID: معرّف الغروب
-- event.body: نص الرسالة
-- args: مصفوفة الحجج
+مثال حقيقي:\n${exampleContent}\n${contextContent ? `\nسياق إضافي:${contextContent}` : ""}`;
 
-مثال أمر حقيقي:
-${exampleContent}
+      const result = await _callAI(
+        systemPrompt,
+        `اكتب أمر DAVID V1 بالمواصفات التالية:\n\n${description}\n\nاكتب فقط كود JavaScript بدون أي شرح. ابدأ بـ "use strict";`,
+        [],
+        2000
+      );
 
-${contextContent ? `سياق إضافي:${contextContent}` : ""}`;
-
-      const msg = await client.messages.create({
-        model: "claude-opus-4-5",
-        max_tokens: 2000,
-        messages: [
-          { role: "user", content: `اكتب أمر DAVID V1 بالمواصفات التالية:\n\n${description}\n\nاكتب فقط كود JavaScript بدون أي شرح. ابدأ بـ "use strict";` }
-        ],
-        system: systemPrompt,
-      });
-
-      let code = msg.content[0]?.text || "";
-      // استخراج الكود من markdown إذا كان مُغلَّفاً
+      let code = result.text;
       const match = code.match(/```(?:javascript|js)?\n?([\s\S]+?)```/);
       if (match) code = match[1].trim();
 
-      res.json({ ok: true, code });
+      res.json({ ok: true, code, provider: result.provider });
     } catch (e) { res.json({ ok: false, error: e.message }); }
   });
 
@@ -876,29 +927,11 @@ ${contextContent ? `سياق إضافي:${contextContent}` : ""}`;
     try {
       const { message: userMsg, history } = req.body;
       if (!userMsg) return res.json({ ok: false, error: "الرسالة مطلوبة" });
-
-      const apiKey = process.env.ANTHROPIC_API_KEY;
-      if (!apiKey) return res.json({ ok: false, error: "ANTHROPIC_API_KEY غير مُعيَّن" });
-
-      const Anthropic = require("@anthropic-ai/sdk");
-      const client = new Anthropic.default({ apiKey });
-
-      const msgs = [];
-      if (Array.isArray(history)) {
-        for (const h of history.slice(-10)) {
-          if (h.role && h.content) msgs.push({ role: h.role, content: h.content });
-        }
-      }
-      msgs.push({ role: "user", content: userMsg });
-
-      const resp = await client.messages.create({
-        model: "claude-haiku-4-5",
-        max_tokens: 1000,
-        messages: msgs,
-        system: "أنت مساعد ذكي خبير في بوتات فيسبوك ماسنجر ونظام DAVID V1. أجب باختصار ووضوح باللغة العربية.",
-      });
-
-      res.json({ ok: true, reply: resp.content[0]?.text || "" });
+      const result = await _callAI(
+        "أنت مساعد ذكي خبير في بوتات فيسبوك ماسنجر ونظام DAVID V1. أجب باختصار ووضوح باللغة العربية.",
+        userMsg, history || [], 1000
+      );
+      res.json({ ok: true, reply: result.text, provider: result.provider });
     } catch (e) { res.json({ ok: false, error: e.message }); }
   });
 
@@ -921,6 +954,236 @@ ${contextContent ? `سياق إضافي:${contextContent}` : ""}`;
         }
       } catch (_) {}
       res.json({ ok: true, message: `✅ تم حفظ الأمر /${safeName}` });
+    } catch (e) { res.json({ ok: false, error: e.message }); }
+  });
+
+  // ── GitHub API ────────────────────────────────────────────────────────────────
+  app.get("/api/github/repo-info", auth, async (req, res) => {
+    try {
+      const { token, repo } = req.query;
+      if (!repo) return res.json({ ok: false, error: "repo مطلوب" });
+      const headers = { "User-Agent": "DAVID-V1-Bot", Accept: "application/vnd.github.v3+json" };
+      if (token) headers["Authorization"] = `token ${token}`;
+      const r = await fetch(`https://api.github.com/repos/${repo}`, { headers });
+      if (!r.ok) return res.json({ ok: false, error: `GitHub API: ${r.status} ${r.statusText}` });
+      const info = await r.json();
+      res.json({ ok: true, info });
+    } catch (e) { res.json({ ok: false, error: e.message }); }
+  });
+
+  // ── ENV vars (save AI keys to .env file) ─────────────────────────────────────
+  app.post("/api/env/set", auth, (req, res) => {
+    try {
+      const { pairs } = req.body;
+      if (!pairs || typeof pairs !== "object") return res.json({ ok: false, error: "pairs مطلوب" });
+      const allowed = ["GROQ_API_KEY","ANTHROPIC_API_KEY","OPENROUTER_API_KEY"];
+      const envPath = path.join(ROOT, ".env");
+      let content = "";
+      try { content = fs.readFileSync(envPath, "utf8"); } catch(_) {}
+      const lines = content.split("\n");
+      for (const [key, val] of Object.entries(pairs)) {
+        if (!allowed.includes(key)) continue;
+        if (!val) continue;
+        // set in memory immediately
+        process.env[key] = val;
+        // update or add in .env file
+        const idx = lines.findIndex(l => l.startsWith(key + "="));
+        const line = `${key}=${val}`;
+        if (idx >= 0) lines[idx] = line;
+        else lines.push(line);
+      }
+      fs.writeFileSync(envPath, lines.filter(Boolean).join("\n") + "\n", "utf8");
+      res.json({ ok: true });
+    } catch (e) { res.json({ ok: false, error: e.message }); }
+  });
+
+  app.post("/api/github/push", auth, async (req, res) => {
+    const log = [];
+    const L = (msg, type="info") => { log.push({ msg, type }); };
+    try {
+      const { token, repo = "castrolmocro/divid-apk", scope = "bot", message = "🤖 DAVID V1 - Auto Update" } = req.body;
+      if (!token) return res.json({ ok: false, error: "GitHub Token مطلوب", log });
+      const ghHeaders = {
+        "Authorization": `token ${token}`,
+        "User-Agent": "DAVID-V1-Bot",
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json"
+      };
+      L("🔑 التحقق من المستخدم…", "info");
+      const userRes = await fetch("https://api.github.com/user", { headers: ghHeaders });
+      if (!userRes.ok) return res.json({ ok: false, error: "توكن GitHub غير صالح", log });
+      const user = await userRes.json();
+      L(`✅ مسجل الدخول كـ: ${user.login}`, "ok");
+
+      L(`📡 جلب معلومات الريبو: ${repo}…`, "info");
+      const repoRes = await fetch(`https://api.github.com/repos/${repo}`, { headers: ghHeaders });
+      if (!repoRes.ok) return res.json({ ok: false, error: `الريبو غير موجود أو لا صلاحية: ${repoRes.status}`, log });
+      const repoInfo = await repoRes.json();
+      const defaultBranch = repoInfo.default_branch || "main";
+      L(`📂 الفرع الافتراضي: ${defaultBranch}`, "info");
+
+      const refRes = await fetch(`https://api.github.com/repos/${repo}/git/refs/heads/${defaultBranch}`, { headers: ghHeaders });
+      let latestSha = null;
+      let baseTreeSha = null;
+      if (refRes.ok) {
+        const refData = await refRes.json();
+        latestSha = refData.object?.sha;
+        if (latestSha) {
+          const commitRes = await fetch(`https://api.github.com/repos/${repo}/git/commits/${latestSha}`, { headers: ghHeaders });
+          if (commitRes.ok) { const cd = await commitRes.json(); baseTreeSha = cd.tree?.sha; }
+        }
+      }
+      L(latestSha ? `🔗 آخر Commit: ${latestSha.slice(0,7)}` : "🆕 ريبو جديد (فارغ)", "info");
+
+      // Collect files to push
+      const filesToPush = [];
+      const skipPatterns = [".git","node_modules",".env","account.txt","*.log","tmp","*.tmp",".DS_Store","coverage","dist/"];
+      const shouldSkip = (p) => skipPatterns.some(s => {
+        if (s.endsWith("/")) return p.startsWith(s);
+        if (s.startsWith("*.")) return p.endsWith(s.slice(1));
+        return p === s || p.includes("/" + s + "/") || p.includes("/" + s);
+      });
+
+      const collectFiles = (dir, base="") => {
+        try {
+          const entries = fs.readdirSync(dir);
+          for (const e of entries) {
+            const full = path.join(dir, e);
+            const rel  = base ? base + "/" + e : e;
+            if (shouldSkip(rel) || shouldSkip(e)) continue;
+            const stat = fs.statSync(full);
+            if (stat.isDirectory()) { collectFiles(full, rel); }
+            else if (stat.size < 500000) { filesToPush.push({ path: rel, fullPath: full }); }
+          }
+        } catch (_) {}
+      };
+
+      if (scope === "bot") {
+        ["src","David.js","index.js","package.json","config.json","manifest.json"].forEach(f => {
+          const full = path.join(ROOT, f);
+          if (!fs.existsSync(full)) return;
+          if (fs.statSync(full).isDirectory()) collectFiles(full, f);
+          else filesToPush.push({ path: f, fullPath: full });
+        });
+      } else if (scope === "apk") {
+        collectFiles(path.join(ROOT, "app"), "app");
+      } else {
+        collectFiles(ROOT);
+      }
+
+      L(`📦 ${filesToPush.length} ملف سيتم رفعه…`, "info");
+      if (!filesToPush.length) return res.json({ ok: false, error: "لا توجد ملفات للرفع", log });
+
+      // Create blobs
+      L("🔨 إنشاء blobs…", "info");
+      const treeItems = [];
+      let processed = 0;
+      for (const f of filesToPush) {
+        try {
+          const content = fs.readFileSync(f.fullPath);
+          const b64 = content.toString("base64");
+          const blobRes = await fetch(`https://api.github.com/repos/${repo}/git/blobs`, {
+            method: "POST", headers: ghHeaders,
+            body: JSON.stringify({ content: b64, encoding: "base64" })
+          });
+          if (blobRes.ok) {
+            const blob = await blobRes.json();
+            treeItems.push({ path: f.path, mode: "100644", type: "blob", sha: blob.sha });
+            processed++;
+            if (processed % 20 === 0) L(`📤 ${processed}/${filesToPush.length} ملف…`, "info");
+          }
+        } catch (_) {}
+      }
+      L(`✅ تم إنشاء ${treeItems.length} blob`, "ok");
+
+      // Create tree
+      L("🌳 إنشاء tree…", "info");
+      const treeBody = { tree: treeItems };
+      if (baseTreeSha) treeBody.base_tree = baseTreeSha;
+      const treeRes = await fetch(`https://api.github.com/repos/${repo}/git/trees`, {
+        method: "POST", headers: ghHeaders, body: JSON.stringify(treeBody)
+      });
+      if (!treeRes.ok) return res.json({ ok: false, error: "فشل إنشاء tree: " + (await treeRes.text()), log });
+      const tree = await treeRes.json();
+
+      // Create commit
+      L("📝 إنشاء commit…", "info");
+      const commitBody = { message, tree: tree.sha, parents: latestSha ? [latestSha] : [] };
+      const commitRes2 = await fetch(`https://api.github.com/repos/${repo}/git/commits`, {
+        method: "POST", headers: ghHeaders, body: JSON.stringify(commitBody)
+      });
+      if (!commitRes2.ok) return res.json({ ok: false, error: "فشل إنشاء commit: " + (await commitRes2.text()), log });
+      const newCommit = await commitRes2.json();
+
+      // Update ref
+      L("🔄 تحديث الفرع…", "info");
+      const updateBody = { sha: newCommit.sha, force: false };
+      let refUpdateRes;
+      if (latestSha) {
+        refUpdateRes = await fetch(`https://api.github.com/repos/${repo}/git/refs/heads/${defaultBranch}`, {
+          method: "PATCH", headers: ghHeaders, body: JSON.stringify(updateBody)
+        });
+      } else {
+        refUpdateRes = await fetch(`https://api.github.com/repos/${repo}/git/refs`, {
+          method: "POST", headers: ghHeaders,
+          body: JSON.stringify({ ref: `refs/heads/${defaultBranch}`, sha: newCommit.sha })
+        });
+      }
+      if (!refUpdateRes.ok) {
+        const errText = await refUpdateRes.text();
+        if (errText.includes("not a fast forward")) {
+          const forceRes = await fetch(`https://api.github.com/repos/${repo}/git/refs/heads/${defaultBranch}`, {
+            method: "PATCH", headers: ghHeaders, body: JSON.stringify({ sha: newCommit.sha, force: true })
+          });
+          if (!forceRes.ok) return res.json({ ok: false, error: "فشل تحديث الفرع (force)", log });
+          L("⚠️ تم الرفع بالقوة (force push)", "warn");
+        } else {
+          return res.json({ ok: false, error: "فشل تحديث الفرع: " + errText, log });
+        }
+      }
+
+      L(`🎉 تم الرفع! SHA: ${newCommit.sha.slice(0,7)} — ${treeItems.length} ملف`, "ok");
+      res.json({ ok: true, sha: newCommit.sha, files: treeItems.length, log });
+    } catch (e) {
+      L("❌ خطأ: " + e.message, "err");
+      res.json({ ok: false, error: e.message, log });
+    }
+  });
+
+  // ── Railway API ───────────────────────────────────────────────────────────────
+  app.get("/api/railway/status", auth, async (req, res) => {
+    try {
+      const { token, projectId } = req.query;
+      if (!token || !projectId) return res.json({ ok: false, error: "token و projectId مطلوبان" });
+      const query = `query { deployments(input: { projectId: "${projectId}" }, first: 1) { edges { node { id status createdAt url } } } }`;
+      const r = await fetch("https://backboard.railway.app/graphql/v2", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ query })
+      });
+      if (!r.ok) return res.json({ ok: false, error: `Railway API: ${r.status}` });
+      const data = await r.json();
+      if (data.errors) return res.json({ ok: false, error: data.errors[0]?.message || "Railway API error" });
+      const dep = data.data?.deployments?.edges?.[0]?.node;
+      if (!dep) return res.json({ ok: false, error: "لا يوجد deployments لهذا المشروع" });
+      res.json({ ok: true, status: { status: dep.status, deploymentId: dep.id, url: dep.url, createdAt: dep.createdAt } });
+    } catch (e) { res.json({ ok: false, error: e.message }); }
+  });
+
+  app.post("/api/railway/deploy", auth, async (req, res) => {
+    try {
+      const { token, projectId } = req.body;
+      if (!token || !projectId) return res.json({ ok: false, error: "token و projectId مطلوبان" });
+      const query = `mutation { deploymentTrigger(input: { projectId: "${projectId}" }) { id } }`;
+      const r = await fetch("https://backboard.railway.app/graphql/v2", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ query })
+      });
+      if (!r.ok) return res.json({ ok: false, error: `Railway API: ${r.status}` });
+      const data = await r.json();
+      if (data.errors) return res.json({ ok: false, error: data.errors[0]?.message });
+      res.json({ ok: true, message: "✅ تم تشغيل الـ Deploy" });
     } catch (e) { res.json({ ok: false, error: e.message }); }
   });
 

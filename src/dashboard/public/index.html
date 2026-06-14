@@ -817,6 +817,84 @@ input:checked+.slider::before{transform:translateX(21px);}
   .act-grid{grid-template-columns:1fr;}
 }
 
+/* ════ RAILWAY TAB ════ */
+.mode-selector{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+@media(max-width:600px){.mode-selector{grid-template-columns:1fr;}}
+.mode-card{
+  padding:16px 12px;border-radius:var(--r2);
+  background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);
+  cursor:pointer;transition:all .22s var(--spring);text-align:center;user-select:none;
+}
+.mode-card:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.22);transform:translateY(-2px);}
+.mode-card.active{border-color:var(--blue);background:rgba(10,132,255,.12);box-shadow:0 4px 20px rgba(10,132,255,.2);}
+.mode-card.active-rail{border-color:var(--purple);background:rgba(191,90,242,.12);box-shadow:0 4px 20px rgba(191,90,242,.2);}
+.mode-card.active-phone{border-color:var(--green);background:rgba(50,215,75,.1);box-shadow:0 4px 20px rgba(50,215,75,.15);}
+.mc-icon{font-size:30px;margin-bottom:8px;}
+.mc-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+.mc-desc{font-size:10px;color:var(--t2);line-height:1.4;}
+.rlw-deploy-card{
+  background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.2);
+  border-radius:var(--r2);padding:14px;margin-bottom:8px;
+  transition:all .2s;cursor:default;
+}
+.rlw-deploy-card:hover{border-color:rgba(99,102,241,.4);}
+.dep-num{font-size:11px;font-weight:700;color:var(--purple);}
+.dep-msg{font-size:13px;margin:3px 0;}
+.dep-meta{font-size:10px;color:var(--t3);}
+.dep-status{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+.dep-ok{background:rgba(50,215,75,.14);color:var(--green);}
+.dep-fail{background:rgba(255,69,58,.12);color:var(--red);}
+.dep-building{background:rgba(255,214,10,.12);color:var(--yellow);animation:blink 1.2s infinite;}
+.dep-idle{background:rgba(255,255,255,.07);color:var(--t2);}
+.push-log{
+  background:rgba(0,0,0,.65);border:1px solid rgba(50,215,75,.15);
+  border-radius:10px;padding:12px 14px;
+  font-family:'SF Mono','Fira Code',monospace;font-size:11px;line-height:1.8;
+  max-height:240px;overflow-y:auto;color:#32D74B;margin-top:10px;
+  display:none;
+}
+.push-log.visible{display:block;}
+.pll{display:block;word-break:break-all;}
+.pll.err{color:var(--red);}
+.pll.warn{color:var(--yellow);}
+.pll.ok{color:var(--green);}
+.pll.info{color:var(--cyan);}
+.terminal-widget{
+  background:rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.1);border-radius:var(--r2);overflow:hidden;
+}
+.tw-bar{background:rgba(255,255,255,.05);padding:8px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(255,255,255,.07);}
+.tw-dot{width:11px;height:11px;border-radius:50%;}
+.tw-r{background:#FF5F57;}.tw-y{background:#FFBD2E;}.tw-g{background:#27C93F;}
+.tw-title{font-size:11px;color:var(--t2);margin-right:auto;font-weight:600;}
+.tw-body{padding:14px;font-family:'SF Mono','Fira Code',monospace;font-size:12px;line-height:1.8;color:#a8ff78;min-height:140px;white-space:pre-wrap;}
+.tw-cmd{color:#fff;font-weight:700;}
+.tw-out{color:rgba(168,255,120,.85);}
+.tw-dim{color:rgba(255,255,255,.3);}
+.step-guide{counter-reset:step;}
+.step-item{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:12px;margin-bottom:8px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r2);
+}
+.step-num{
+  width:26px;height:26px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+}
+.step-content{flex:1;}
+.step-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+.step-code{
+  background:rgba(0,0,0,.4);border-radius:6px;padding:5px 10px;
+  font-family:'SF Mono',monospace;font-size:11px;color:var(--cyan);
+  display:inline-block;margin-top:4px;cursor:pointer;user-select:all;
+}
+.step-code:hover{background:rgba(10,132,255,.15);}
+.rlw-status-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.rlw-status-row:last-child{border-bottom:none;}
+.rlw-srl{font-size:13px;font-weight:600;}
+.rlw-srr{font-size:12px;color:var(--t2);}
+
 /* ── AI Tab ── */
 .ai-loading{display:flex;align-items:center;gap:8px;padding:12px 0;}
 .ai-loading.hidden{display:none;}
@@ -1002,6 +1080,10 @@ input:checked+.slider::before{transform:translateX(21px);}
     <div class="bn-indicator"></div>
     <span class="bn-ic">📁</span>ملفات
   </button>
+  <button class="bn" data-tab="railway">
+    <div class="bn-indicator"></div>
+    <span class="bn-ic">🚀</span>Railway
+  </button>
 </nav>
 
 <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
@@ -1047,6 +1129,7 @@ input:checked+.slider::before{transform:translateX(21px);}
     <button class="tab" data-tab="logs">📋 السجلات</button>
     <button class="tab" data-tab="ai">🤖 ذكاء AI</button>
     <button class="tab" data-tab="files">📁 الملفات</button>
+    <button class="tab" data-tab="railway">🚀 Railway</button>
   </div>
 
   <div class="page-wrap">
@@ -1396,6 +1479,35 @@ input:checked+.slider::before{transform:translateX(21px);}
       </div>
       <div class="hint" id="adm-hint" style="margin-top:8px;"></div>
     </div>
+
+    <!-- AI API Keys -->
+    <div class="card">
+      <div class="card-title">🤖 مفاتيح الذكاء الاصطناعي (اختياري)</div>
+      <div style="font-size:12px;color:var(--t3);margin-bottom:14px;padding:8px 12px;background:rgba(52,199,89,.06);border-radius:8px;border:1px solid rgba(52,199,89,.2);">
+        ✅ <b>صفحة AI تعمل مجاناً بدون أي مفتاح</b> — لكن يمكنك إضافة مفاتيح للحصول على أداء أفضل وسرعة أكبر.
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">🟢 Groq — مجاني تماماً (الأفضل)</div>
+        <div class="fg">
+          <label>GROQ_API_KEY</label>
+          <input type="password" id="cfg-groqKey" placeholder="gsk_... (اسجل مجاناً على console.groq.com)">
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px">نموذج Llama 3.3 70B — 14,400 طلب مجاني يومياً</div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">🟣 Anthropic Claude (مدفوع)</div>
+        <div class="fg">
+          <label>ANTHROPIC_API_KEY</label>
+          <input type="password" id="cfg-anthropicKey" placeholder="sk-ant-... (اختياري — مدفوع)">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveAIKeys()">💾 حفظ المفاتيح</button>
+        <a href="https://console.groq.com/keys" target="_blank" class="btn btn-ghost btn-sm">🔗 احصل على Groq مجاني</a>
+      </div>
+      <div class="hint" id="ai-keys-hint" style="margin-top:8px;"></div>
+    </div>
+
   </div>
 
   <!-- ─── Messages ──────────────────────────────────── -->
@@ -1428,48 +1540,64 @@ input:checked+.slider::before{transform:translateX(21px);}
 
   <!-- ─── AI Command Generator ─────────────────────── -->
   <div class="tab-pane" id="tab-ai">
-    <div class="card">
-      <div class="card-title">🤖 توليد أوامر بالذكاء الاصطناعي</div>
-      <div class="ai-state" id="aiNoKey" style="display:none">
-        <div style="font-size:36px;margin-bottom:12px">🔑</div>
-        <div style="color:var(--t2);font-size:14px;margin-bottom:16px">لم يتم ضبط <code style="background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px">ANTHROPIC_API_KEY</code></div>
-        <div style="font-size:12px;color:var(--t3)">أضف المفتاح في ملف .env أو متغيرات البيئة</div>
+
+    <!-- Provider Badge -->
+    <div id="aiProviderBadge" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;">
+      <div id="aiProviderIcon" style="font-size:20px">🤖</div>
+      <div style="flex:1">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:2px">مزوّد الذكاء الاصطناعي النشط</div>
+        <div id="aiProviderName" style="font-size:13px;font-weight:600;color:var(--t1)">جاري التحقق…</div>
       </div>
-      <div id="aiForm">
-        <label class="form-lbl">📝 صِف الأمر الذي تريده (بالعربية أو الإنجليزية)</label>
-        <textarea id="aiDesc" class="form-ctrl" rows="4" placeholder="مثال: أمر يعرض نكتة عشوائية، أو أمر يحذف أعضاء الغروب الجدد تلقائياً..." style="resize:vertical;min-height:100px;font-size:13px;line-height:1.6"></textarea>
-        <label class="form-lbl" style="margin-top:10px">📂 ملفات سياق (اختياري)</label>
-        <div class="ai-ctx-files" id="aiCtxFiles">
-          <div style="font-size:11px;color:var(--t3);margin-bottom:6px">اضغط على الملفات لإضافتها كسياق للـ AI</div>
-          <div class="ai-ctx-chips" id="aiCtxChips"></div>
-        </div>
-        <div class="btn-row" style="margin-top:12px">
-          <button class="btn btn-primary" onclick="aiGenerate()">✨ توليد</button>
-          <button class="btn btn-ghost btn-sm" onclick="aiChat()">💬 محادثة</button>
-        </div>
-        <div id="aiLoading" class="ai-loading hidden">
-          <div class="ai-loading-dot"></div><div class="ai-loading-dot"></div><div class="ai-loading-dot"></div>
-          <span style="font-size:12px;color:var(--t2);margin-right:10px">يتم التوليد…</span>
-        </div>
+      <div id="aiProviderTag" style="font-size:10px;padding:3px 8px;border-radius:20px;background:rgba(52,199,89,.15);color:#34c759;border:1px solid rgba(52,199,89,.3)">✅ نشط</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✨ توليد أمر جديد بالذكاء الاصطناعي</div>
+      <div style="font-size:12px;color:var(--t3);margin-bottom:14px;padding:8px 12px;background:rgba(10,132,255,.08);border-radius:8px;border:1px solid rgba(10,132,255,.2);">
+        💡 يعمل <b>مجاناً بدون أي مفتاح API</b> — يستخدم GPT-4o عبر Pollinations.ai تلقائياً. لأداء أفضل أضف مفتاح Groq أو Anthropic من الإعدادات.
+      </div>
+      <label class="form-lbl">📝 صِف الأمر الذي تريده (بالعربية أو الإنجليزية)</label>
+      <textarea id="aiDesc" class="form-ctrl" rows="4" placeholder="مثال: أمر يعرض نكتة عشوائية باللغة العربية&#10;مثال: أمر يحسب الفرق بين تاريخين ويعرض النتيجة&#10;مثال: أمر يرسل صورة عشوائية من الإنترنت" style="resize:vertical;min-height:110px;font-size:13px;line-height:1.6"></textarea>
+      <label class="form-lbl" style="margin-top:10px">📂 ملفات سياق (اختياري — تساعد الـ AI على فهم بنية بوتك)</label>
+      <div class="ai-ctx-files" id="aiCtxFiles">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:6px">اضغط على ملف من صفحة الملفات لإضافته كسياق</div>
+        <div class="ai-ctx-chips" id="aiCtxChips"></div>
+      </div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn btn-primary" onclick="aiGenerate()" style="gap:6px">
+          <span>✨</span> <span>توليد الأمر</span>
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="aiChat()" style="gap:4px">💬 محادثة</button>
+      </div>
+      <div id="aiLoading" class="ai-loading hidden">
+        <div class="ai-loading-dot"></div><div class="ai-loading-dot"></div><div class="ai-loading-dot"></div>
+        <span style="font-size:12px;color:var(--t2);margin-right:10px">يتم التوليد…</span>
       </div>
     </div>
+
     <div class="card" id="aiResultCard" style="display:none">
-      <div class="card-title">📋 الكود المُولَّد</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div class="card-title" style="margin:0">📋 الكود المُولَّد</div>
+        <div id="aiResultProvider" style="font-size:11px;color:var(--t3);background:rgba(255,255,255,.06);padding:3px 8px;border-radius:6px"></div>
+      </div>
       <div class="ai-code-header">
         <input id="aiCmdName" class="form-ctrl" placeholder="اسم الأمر (بالإنجليزية)" style="max-width:200px;font-size:13px" oninput="this.value=this.value.replace(/[^a-z0-9_-]/gi,'').toLowerCase()">
         <button class="btn btn-success btn-sm" onclick="aiSaveCmd()">💾 حفظ كأمر</button>
         <button class="btn btn-ghost btn-sm" onclick="aiCopyCode()">📋 نسخ</button>
+        <button class="btn btn-ghost btn-sm" onclick="aiRegenerate()">🔄 إعادة توليد</button>
       </div>
       <pre class="ai-code-pre" id="aiCodePre"></pre>
     </div>
+
     <div class="card" id="aiChatCard" style="display:none">
-      <div class="card-title">💬 محادثة مع Claude</div>
+      <div class="card-title">💬 محادثة مع الذكاء الاصطناعي</div>
       <div class="ai-chat-msgs" id="aiChatMsgs"></div>
       <div class="input-row" style="margin-top:10px">
-        <textarea id="aiChatInput" class="form-ctrl" rows="2" placeholder="اسأل Claude عن البوت أو الأوامر..." style="font-size:13px;resize:none" onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter')aiSendChat()"></textarea>
+        <textarea id="aiChatInput" class="form-ctrl" rows="2" placeholder="اسأل عن البوت أو الأوامر… (Ctrl+Enter للإرسال)" style="font-size:13px;resize:none" onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter')aiSendChat()"></textarea>
         <button class="btn btn-primary" onclick="aiSendChat()" style="flex-shrink:0;min-width:56px">إرسال</button>
       </div>
     </div>
+
   </div>
 
   <!-- ─── File Browser ───────────────────────────────── -->
@@ -1500,6 +1628,179 @@ input:checked+.slider::before{transform:translateX(21px);}
       </div>
     </div>
   </div>
+
+  <!-- ─── RAILWAY ─────────────────────────────────── -->
+  <div class="tab-pane" id="tab-railway">
+
+    <!-- وضع الاستضافة -->
+    <div class="card">
+      <div class="card-title">🔗 وضع الاستضافة</div>
+      <div class="mode-selector" id="hostModeSelector">
+        <div class="mode-card active-rail" id="mcard-railway" onclick="setHostMode('railway')">
+          <div class="mc-icon">🚂</div>
+          <div class="mc-title">Railway</div>
+          <div class="mc-desc">نشر مجاني على السحابة، يعمل 24/7</div>
+        </div>
+        <div class="mode-card" id="mcard-replit" onclick="setHostMode('replit')">
+          <div class="mc-icon">🔵</div>
+          <div class="mc-title">Replit</div>
+          <div class="mc-desc">التشغيل الحالي على منصة Replit</div>
+        </div>
+        <div class="mode-card" id="mcard-phone" onclick="setHostMode('phone')">
+          <div class="mc-icon">📱</div>
+          <div class="mc-title">الهاتف</div>
+          <div class="mc-desc">تشغيل البوت مباشرة من هاتفك الأندرويد</div>
+        </div>
+      </div>
+      <div id="hostModeContent"></div>
+    </div>
+
+    <!-- رفع على GitHub -->
+    <div class="card">
+      <div class="card-title">📦 رفع الكود على GitHub</div>
+      <p style="font-size:12px;color:var(--t2);margin-bottom:12px;">
+        ارفع كود البوت على الريبو
+        <a href="https://github.com/castrolmocro/divid-apk" target="_blank" style="color:var(--blue);text-decoration:none;">castrolmocro/divid-apk</a>
+        تلقائياً باستخدام GitHub API.
+      </p>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">🔑 GitHub Personal Access Token</label>
+        <input class="form-input" type="password" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+          value="" oninput="localStorage.setItem('gh_token',this.value)">
+        <div style="font-size:10px;color:var(--t3);margin-top:4px;">
+          اذهب إلى
+          <a href="https://github.com/settings/tokens/new" target="_blank" style="color:var(--blue)">GitHub Settings → Tokens</a>
+          واختر صلاحية <code style="background:rgba(255,255,255,.1);padding:1px 5px;border-radius:4px;">repo</code>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="form-label">📁 الملفات المراد رفعها</label>
+        <select class="form-input" id="ghFilesScope" style="font-size:13px;">
+          <option value="all">كل الملفات (الكاملة)</option>
+          <option value="bot">ملفات البوت فقط (src/, David.js, index.js, package.json)</option>
+          <option value="apk">ملفات APK فقط (app/)</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="form-label">💬 رسالة الـ Commit</label>
+        <input class="form-input" type="text" id="ghCommitMsg" value="🤖 DAVID V1 - Auto Update" placeholder="رسالة الـ Commit">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="btnPushGithub" onclick="pushToGithub()">
+          📤 رفع على GitHub
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="checkGithubRepo()">
+          🔍 فحص الريبو
+        </button>
+      </div>
+      <div id="pushLog" class="push-log"></div>
+      <div id="repoInfoBox" style="display:none;margin-top:10px;"></div>
+    </div>
+
+    <!-- إعدادات Railway -->
+    <div class="card" id="railwayConfigCard">
+      <div class="card-title">🚂 إعدادات Railway</div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">🔑 Railway API Token</label>
+        <input class="form-input" type="password" id="rlwApiToken" placeholder="أدخل Railway API Token"
+          oninput="localStorage.setItem('rlw_token',this.value)">
+        <div style="font-size:10px;color:var(--t3);margin-top:4px;">
+          <a href="https://railway.app/account/tokens" target="_blank" style="color:var(--blue)">railway.app/account/tokens</a>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="form-label">🆔 Project ID</label>
+        <input class="form-input" type="text" id="rlwProjectId" placeholder="Project ID من Railway"
+          oninput="localStorage.setItem('rlw_projid',this.value)">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="rlwCheckStatus()">📡 فحص الحالة</button>
+        <button class="btn btn-ghost btn-sm" onclick="rlwTriggerDeploy()">🚀 Deploy الآن</button>
+      </div>
+      <div id="rlwStatusBox" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- دليل نشر Railway -->
+    <div class="card">
+      <div class="card-title">📖 دليل النشر على Railway</div>
+      <div class="step-guide">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">أنشئ حساباً على Railway</div>
+            <div style="font-size:12px;color:var(--t2);">اذهب إلى <a href="https://railway.app" target="_blank" style="color:var(--blue)">railway.app</a> وسجّل دخول بـ GitHub</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">ارفع الكود على GitHub أولاً</div>
+            <div style="font-size:12px;color:var(--t2);">استخدم قسم "رفع على GitHub" أعلاه</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">New Project → Deploy from GitHub Repo</div>
+            <div style="font-size:12px;color:var(--t2);">اختر الريبو <span class="step-code">castrolmocro/divid-apk</span></div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">أضف متغيرات البيئة (Environment Variables)</div>
+            <div style="font-size:12px;color:var(--t2);margin-bottom:6px;">في لوحة Railway → Variables:</div>
+            <div class="step-code" onclick="copyText(this)">NODE_ENV=production</div><br>
+            <div class="step-code" onclick="copyText(this)">PORT=3000</div><br>
+            <div class="step-code" onclick="copyText(this)">DASHBOARD_PASSWORD=david2025</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-title">أدخل رابط Railway في تطبيق Android</div>
+            <div style="font-size:12px;color:var(--t2);">من تطبيق DAVID → الإعدادات → عنوان السيرفر</div>
+            <div class="step-code" onclick="copyText(this)" id="rlwUrlCopy">https://your-project.railway.app</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الهاتف كسيرفر -->
+    <div class="card" id="phoneHostCard">
+      <div class="card-title">📱 الهاتف كسيرفر (بدون انترنت خارجي)</div>
+      <p style="font-size:12px;color:var(--t2);margin-bottom:12px;">
+        شغّل البوت مباشرة من هاتفك الأندرويد — البوت والتطبيق يعملان على نفس الجهاز.
+      </p>
+
+      <div class="terminal-widget" style="margin-bottom:12px;">
+        <div class="tw-bar">
+          <div class="tw-dot tw-r"></div><div class="tw-dot tw-y"></div><div class="tw-dot tw-g"></div>
+          <span class="tw-title">📲 إعداد الهاتف كسيرفر</span>
+        </div>
+        <div class="tw-body"><span class="tw-dim"># 1. ثبّت Termux من F-Droid (لا من Play Store)</span>
+<span class="tw-cmd">pkg update && pkg upgrade -y</span>
+<span class="tw-cmd">pkg install nodejs git -y</span>
+<span class="tw-cmd">git clone https://github.com/castrolmocro/divid-apk</span>
+<span class="tw-cmd">cd divid-apk && npm install</span>
+<span class="tw-cmd">node index.js</span>
+<span class="tw-out">✅ البوت يعمل على http://localhost:5000</span>
+<span class="tw-dim"># 2. افتح التطبيق وسيتصل تلقائياً بـ localhost</span></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🔗 رابط الاتصال المحلي</label>
+        <div style="display:flex;gap:6px;">
+          <input class="form-input" type="text" id="phoneHostUrl" value="http://localhost:5000" style="flex:1;">
+          <button class="btn btn-ghost btn-sm" onclick="copyText(document.getElementById('phoneHostUrl'))">📋 نسخ</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--t3);margin-top:6px;">
+        ⚠️ عند استخدام الهاتف كسيرفر، التطبيق وBوت على نفس الجهاز. استخدم Railway للتشغيل عن بعد.
+      </div>
+    </div>
+
+  </div><!-- /tab-railway -->
 
   </div><!-- /page-wrap -->
 </div><!-- /main -->
@@ -2689,6 +2990,9 @@ const TAB_THEMES = {
   settings:   { img:"/angel2.png", tint:"rgba(255,69,58,.06)",   orbColor:"#FF453A" },
   messages:   { img:"/angel.png",  tint:"rgba(191,90,242,.08)",  orbColor:"#BF5AF2" },
   logs:       { img:"/angel2.png", tint:"rgba(255,214,10,.07)",  orbColor:"#FFD60A" },
+  ai:         { img:"/angel.png",  tint:"rgba(50,215,75,.08)",   orbColor:"#32D74B" },
+  files:      { img:"/angel2.png", tint:"rgba(90,200,250,.08)",  orbColor:"#5AC8FA" },
+  railway:    { img:"/angel.png",  tint:"rgba(99,102,241,.1)",   orbColor:"#6366F1" },
 };
 
 function updateTabBackground(tab) {
@@ -2707,7 +3011,7 @@ function updateTabBackground(tab) {
 /* ═══════════════════════════════════════════════════
    SWIPE GESTURE — navigate tabs by swiping left/right
    ═══════════════════════════════════════════════════ */
-const TAB_ORDER = ["control","messenger","cookies","commands","activation","editor","protection","settings","messages","logs"];
+const TAB_ORDER = ["control","messenger","cookies","commands","activation","editor","protection","settings","messages","logs","ai","files","railway"];
 
 let _touchStartX = 0, _touchStartY = 0, _touchStartTime = 0;
 let _swipeHintTimer = null;
@@ -2724,9 +3028,9 @@ document.addEventListener("touchend", e => {
   const dt = Date.now() - _touchStartTime;
 
   // Must be fast enough, horizontal enough, and long enough
-  if (dt > 600) return;                          // too slow
-  if (Math.abs(dx) < 55) return;                // too short
-  if (Math.abs(dy) > Math.abs(dx) * 0.75) return; // too vertical
+  if (dt > 900) return;                          // too slow
+  if (Math.abs(dx) < 45) return;                // too short
+  if (Math.abs(dy) > Math.abs(dx) * 1.1) return; // too vertical
 
   // Don't swipe inside messenger chat messages
   const target = e.target;
@@ -2760,7 +3064,8 @@ function showSwipeHint(text) {
 const TAB_LABELS = {
   control:"الرئيسية", messenger:"مسنجر", cookies:"كوكيز", commands:"أوامر",
   activation:"تفعيل", editor:"محرر", protection:"حماية",
-  settings:"إعدادات", messages:"رسائل", logs:"سجلات"
+  settings:"إعدادات", messages:"رسائل", logs:"سجلات",
+  ai:"ذكاء AI", files:"ملفات", railway:"Railway 🚀"
 };
 function getTabLabel(tab) { return TAB_LABELS[tab] || tab; }
 
@@ -2773,6 +3078,22 @@ let _aiChatHistory= [];
 let _currentFile  = null;
 let _fileTree     = [];
 
+async function aiLoadProvider() {
+  try {
+    const r = await api("/api/ai/provider","GET");
+    if (!r.ok) return;
+    const icons = { anthropic:"🟣", groq:"🟢", free:"🔵" };
+    document.getElementById("aiProviderIcon").textContent = icons[r.provider] || "🤖";
+    document.getElementById("aiProviderName").textContent = r.name;
+    if (r.provider === "free") {
+      document.getElementById("aiProviderTag").textContent = "✅ مجاني بدون key";
+      document.getElementById("aiProviderTag").style.background = "rgba(10,132,255,.15)";
+      document.getElementById("aiProviderTag").style.color = "#0a84ff";
+      document.getElementById("aiProviderTag").style.borderColor = "rgba(10,132,255,.3)";
+    }
+  } catch(_) {}
+}
+
 async function aiGenerate() {
   const desc = document.getElementById("aiDesc").value.trim();
   if (!desc) { toast("اكتب وصفاً للأمر أولاً","error"); return; }
@@ -2781,20 +3102,26 @@ async function aiGenerate() {
   try {
     const r = await api("/api/ai/generate","POST",{ description: desc, contextFiles: _aiCtxFiles });
     if (!r.ok) {
-      if (r.error?.includes("ANTHROPIC_API_KEY")) {
-        document.getElementById("aiNoKey").style.display = "";
-        document.getElementById("aiForm").style.display = "none";
-      }
-      toast(r.error||"خطأ في التوليد","error");
+      const errMsg = r.error === "rate_limit"
+        ? "⏱️ حدّ الطلبات المجانية — انتظر 10 ثوانٍ وأعد المحاولة (أو أضف مفتاح Groq من الإعدادات للاستخدام غير المحدود)"
+        : (r.error||"خطأ في التوليد");
+      toast(errMsg, "error");
     } else {
       document.getElementById("aiCodePre").textContent = r.code;
       const nameMatch = r.code.match(/name\s*:\s*["'`]([^"'`]+)["'`]/);
       if (nameMatch) document.getElementById("aiCmdName").value = nameMatch[1].toLowerCase().replace(/[^a-z0-9_-]/g,"");
+      const pNames = { anthropic:"Claude (Anthropic)", groq:"Llama 3.3 (Groq)", free:"GPT-4o (Pollinations — مجاني)" };
+      document.getElementById("aiResultProvider").textContent = "🤖 " + (pNames[r.provider] || r.provider || "");
       document.getElementById("aiResultCard").style.display = "";
       toast("✅ تم التوليد بنجاح","ok");
     }
   } catch(e){ toast("خطأ: "+e.message,"error"); }
   document.getElementById("aiLoading").classList.add("hidden");
+}
+
+function aiRegenerate() {
+  document.getElementById("aiResultCard").style.display = "none";
+  aiGenerate();
 }
 
 async function aiSaveCmd() {
@@ -2810,6 +3137,28 @@ async function aiSaveCmd() {
 function aiCopyCode() {
   const code = document.getElementById("aiCodePre").textContent;
   navigator.clipboard?.writeText(code).then(()=>toast("تم النسخ","ok")).catch(()=>toast("لا يدعم النسخ","error"));
+}
+
+async function saveAIKeys() {
+  const groq = document.getElementById("cfg-groqKey").value.trim();
+  const anthropic = document.getElementById("cfg-anthropicKey").value.trim();
+  const hint = document.getElementById("ai-keys-hint");
+  const pairs = {};
+  if (groq) pairs["GROQ_API_KEY"] = groq;
+  if (anthropic) pairs["ANTHROPIC_API_KEY"] = anthropic;
+  if (!Object.keys(pairs).length) { hint.textContent = "⚠️ لم تُدخل أي مفتاح"; hint.style.color="var(--orange)"; return; }
+  try {
+    const r = await api("/api/env/set","POST", { pairs });
+    if (r.ok) {
+      hint.textContent = "✅ تم الحفظ — سيُطبَّق عند إعادة تشغيل السيرفر";
+      hint.style.color="var(--green)";
+      document.getElementById("cfg-groqKey").value = "";
+      document.getElementById("cfg-anthropicKey").value = "";
+      // refresh provider badge
+      _tabInitDone.delete("ai");
+      setTimeout(aiLoadProvider, 500);
+    } else { hint.textContent = "❌ " + (r.error||"فشل"); hint.style.color="var(--red)"; }
+  } catch(e) { hint.textContent = "❌ "+e.message; hint.style.color="var(--red)"; }
 }
 
 function aiChat() {
@@ -2990,8 +3339,13 @@ function switchTabHook(tab) {
     _tabInitDone.add("files");
     loadFileTree();
   }
+  if (tab === "railway" && !_tabInitDone.has("railway")) {
+    _tabInitDone.add("railway");
+    initRailwayTab();
+  }
   if (tab === "ai" && !_tabInitDone.has("ai")) {
     _tabInitDone.add("ai");
+    aiLoadProvider();
     // Pre-load context file list from recent commands
     fetch("/api/files/tree", { headers:{ "Authorization": "Bearer "+_token }})
       .then(r=>r.json()).then(r=>{
@@ -3016,6 +3370,154 @@ function switchTabHook(tab) {
 document.querySelectorAll("[data-tab]").forEach(btn => {
   btn.addEventListener("click", () => switchTabHook(btn.dataset.tab));
 });
+
+/* ═══════════════════════════════════════════════════
+   RAILWAY + GITHUB MODULE
+   ═══════════════════════════════════════════════════ */
+let _hostMode = localStorage.getItem("host_mode") || "railway";
+
+function initRailwayTab() {
+  const ghT = localStorage.getItem("gh_token") || "";
+  const rlwT = localStorage.getItem("rlw_token") || "";
+  const rlwP = localStorage.getItem("rlw_projid") || "";
+  const ghInput = document.getElementById("ghTokenInput");
+  const rlwTInput = document.getElementById("rlwApiToken");
+  const rlwPInput = document.getElementById("rlwProjectId");
+  if (ghInput && ghT) ghInput.value = ghT;
+  if (rlwTInput && rlwT) rlwTInput.value = rlwT;
+  if (rlwPInput && rlwP) rlwPInput.value = rlwP;
+  setHostMode(_hostMode, false);
+}
+
+function setHostMode(mode, save=true) {
+  _hostMode = mode;
+  if (save) localStorage.setItem("host_mode", mode);
+  ["railway","replit","phone"].forEach(m => {
+    const el = document.getElementById("mcard-"+m);
+    if (!el) return;
+    el.className = "mode-card";
+    if (m === mode) el.classList.add(m === "railway" ? "active-rail" : m === "phone" ? "active-phone" : "active");
+  });
+  const box = document.getElementById("hostModeContent");
+  if (!box) return;
+  if (mode === "railway") {
+    box.innerHTML = `<div style="padding:10px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:12px;font-size:12px;color:var(--t2);">
+      🚂 وضع Railway مفعّل — اضبط إعدادات Railway أدناه واضغط "فحص الحالة"
+    </div>`;
+  } else if (mode === "replit") {
+    box.innerHTML = `<div style="padding:10px;background:rgba(10,132,255,.08);border:1px solid rgba(10,132,255,.2);border-radius:12px;font-size:12px;color:var(--t2);">
+      🔵 أنت الآن على Replit — البوت يعمل هنا مباشرةً. لنشره بشكل دائم استخدم Railway.
+    </div>`;
+  } else if (mode === "phone") {
+    box.innerHTML = `<div style="padding:10px;background:rgba(50,215,75,.07);border:1px solid rgba(50,215,75,.18);border-radius:12px;font-size:12px;color:var(--t2);">
+      📱 وضع الهاتف — تأكد أن البوت يعمل عبر Termux على نفس الجهاز. اقرأ الدليل أدناه.
+    </div>`;
+  }
+}
+
+function addPushLog(msg, type="") {
+  const box = document.getElementById("pushLog");
+  if (!box) return;
+  box.classList.add("visible");
+  const span = document.createElement("span");
+  span.className = "pll" + (type ? " "+type : "");
+  span.textContent = new Date().toTimeString().slice(0,8) + "  " + msg;
+  box.appendChild(span);
+  box.scrollTop = box.scrollHeight;
+}
+
+function copyText(el) {
+  const text = el.value || el.textContent;
+  navigator.clipboard?.writeText(text).then(() => toast("📋 تم النسخ","success",1500)).catch(() => toast("تعذر النسخ","error"));
+}
+
+async function pushToGithub() {
+  const token = (document.getElementById("ghTokenInput")?.value || "").trim();
+  if (!token) { toast("❌ أدخل GitHub Token أولاً","error"); return; }
+  const scope = document.getElementById("ghFilesScope")?.value || "bot";
+  const msg = (document.getElementById("ghCommitMsg")?.value?.trim()) || "🤖 DAVID V1 - Auto Update";
+  const btn = document.getElementById("btnPushGithub");
+  btn.disabled = true; btn.textContent = "⏳ جاري الرفع…";
+  const box = document.getElementById("pushLog");
+  if (box) { box.innerHTML = ""; box.classList.add("visible"); }
+  addPushLog("📦 بدء عملية الرفع إلى GitHub…", "info");
+  addPushLog("🔑 التحقق من التوكن…", "info");
+
+  try {
+    const r = await apiFetch("/api/github/push", {
+      method: "POST",
+      body: JSON.stringify({ token, repo: "castrolmocro/divid-apk", scope, message: msg })
+    });
+    if (r.ok) {
+      (r.log || []).forEach(l => addPushLog(l.msg, l.type));
+      addPushLog("✅ تم الرفع بنجاح! SHA: " + (r.sha || "—"), "ok");
+      toast("✅ تم الرفع على GitHub بنجاح!","success");
+    } else {
+      (r.log || []).forEach(l => addPushLog(l.msg, l.type));
+      addPushLog("❌ فشل: " + (r.error || "خطأ غير معروف"), "err");
+      toast("❌ " + (r.error || "فشل الرفع"), "error");
+    }
+  } catch(e) {
+    addPushLog("❌ خطأ: " + e.message, "err");
+    toast("❌ خطأ في الاتصال","error");
+  }
+  btn.disabled = false; btn.textContent = "📤 رفع على GitHub";
+}
+
+async function checkGithubRepo() {
+  const token = (document.getElementById("ghTokenInput")?.value || "").trim();
+  const box = document.getElementById("repoInfoBox");
+  if (!box) return;
+  box.style.display = "block";
+  box.innerHTML = '<div style="color:var(--t2);font-size:12px">⏳ جاري الفحص…</div>';
+  try {
+    const r = await apiFetch("/api/github/repo-info?token="+encodeURIComponent(token)+"&repo=castrolmocro/divid-apk");
+    if (r.ok && r.info) {
+      const i = r.info;
+      box.innerHTML = `<div style="background:rgba(50,215,75,.07);border:1px solid rgba(50,215,75,.18);border-radius:12px;padding:12px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;">✅ ${i.full_name}</div>
+        <div style="font-size:11px;color:var(--t2);">⭐ ${i.stargazers_count} &nbsp;|&nbsp; 🍴 ${i.forks_count} &nbsp;|&nbsp; 📝 ${i.default_branch}</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px;">آخر تحديث: ${new Date(i.updated_at).toLocaleDateString("ar")}</div>
+      </div>`;
+    } else {
+      box.innerHTML = `<div style="color:var(--red);font-size:12px;">❌ ${r.error || "تعذر الفحص — تأكد من التوكن والريبو"}</div>`;
+    }
+  } catch(e) {
+    box.innerHTML = `<div style="color:var(--red);font-size:12px;">❌ خطأ: ${e.message}</div>`;
+  }
+}
+
+async function rlwCheckStatus() {
+  const token = (document.getElementById("rlwApiToken")?.value || "").trim();
+  const projectId = (document.getElementById("rlwProjectId")?.value || "").trim();
+  const box = document.getElementById("rlwStatusBox");
+  if (!box) return;
+  if (!token || !projectId) { box.innerHTML = '<div style="color:var(--yellow);font-size:12px;">⚠️ أدخل API Token و Project ID أولاً</div>'; return; }
+  box.innerHTML = '<div style="color:var(--t2);font-size:12px">⏳ جاري الفحص…</div>';
+  const r = await apiFetch(`/api/railway/status?token=${encodeURIComponent(token)}&projectId=${encodeURIComponent(projectId)}`);
+  if (r.ok) {
+    const s = r.status || {};
+    const sc = s.status === "SUCCESS" ? "dep-ok" : s.status === "FAILED" ? "dep-fail" : s.status === "BUILDING" ? "dep-building" : "dep-idle";
+    box.innerHTML = `<div style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.18);border-radius:12px;padding:12px;">
+      <div class="rlw-status-row"><span class="rlw-srl">الحالة</span><span class="dep-status ${sc}">${s.status||"—"}</span></div>
+      <div class="rlw-status-row"><span class="rlw-srl">الـ Deployment</span><span class="rlw-srr">${s.deploymentId||"—"}</span></div>
+      <div class="rlw-status-row"><span class="rlw-srl">الرابط</span><span class="rlw-srr">${s.url ? `<a href="https://${s.url}" target="_blank" style="color:var(--blue)">${s.url}</a>` : "—"}</span></div>
+      ${s.createdAt ? `<div class="rlw-status-row"><span class="rlw-srl">آخر نشر</span><span class="rlw-srr">${new Date(s.createdAt).toLocaleString("ar")}</span></div>` : ""}
+    </div>`;
+    if (s.url) { const el = document.getElementById("rlwUrlCopy"); if (el) el.textContent = "https://"+s.url; }
+  } else {
+    box.innerHTML = `<div style="color:var(--red);font-size:12px;">❌ ${r.error||"فشل الاتصال بـ Railway"}</div>`;
+  }
+}
+
+async function rlwTriggerDeploy() {
+  const token = (document.getElementById("rlwApiToken")?.value || "").trim();
+  const projectId = (document.getElementById("rlwProjectId")?.value || "").trim();
+  if (!token || !projectId) { toast("❌ أدخل API Token و Project ID","error"); return; }
+  const r = await apiFetch("/api/railway/deploy", { method:"POST", body:JSON.stringify({ token, projectId }) });
+  if (r.ok) { toast("🚀 تم تشغيل الـ Deploy!","success"); setTimeout(rlwCheckStatus, 3000); }
+  else toast("❌ " + (r.error||"فشل"), "error");
+}
 
 /* ─── Service Worker ─── */
 if ("serviceWorker" in navigator) {
