@@ -4,7 +4,7 @@ nixPkgs = ["nodejs_20", "python3", "pkg-config", "pixman", "cairo", "pango", "li
 [phases.install]
 cmds = [
   "npm install --legacy-peer-deps --no-audit",
-  "node -e \"try{const f='node_modules/@dongdev/fca-unofficial/node_modules/gradient-string/dist/index.js';const s=require('fs').readFileSync(f,'utf8');if(!s.includes('module.exports')){const fixed=s.replace(/export default (\\w+)/,'module.exports=$1').replace(/export\\s*\\{[^}]*\\}/,'');require('fs').writeFileSync(f,fixed);}}catch(_){}\" || true"
+  "node -e \"try{const fs=require('fs');const fix=f=>{try{const s=fs.readFileSync(f,'utf8');if(s.includes('export')&&!s.includes('module.exports')){fs.writeFileSync(f,s.replace(/export default (\\w+)/,'module.exports=$1').replace(/export\\s*\\{[^}]*\\}/,''));}}catch(_){}};fix('node_modules/gradient-string/dist/index.js');fix('node_modules/@dongdev/fca-unofficial/node_modules/gradient-string/dist/index.js');\" || true"
 ]
 
 [start]
