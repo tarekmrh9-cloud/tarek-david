@@ -1,0 +1,12 @@
+{
+  "providers": ["node"],
+  "install": {
+    "cmds": ["npm install --legacy-peer-deps", "node scripts/fix-esm.js"]
+  },
+  "build": {
+    "cmds": []
+  },
+  "start": {
+    "cmd": "node index.js"
+  }
+}
