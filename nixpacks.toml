@@ -1,11 +1,9 @@
 [phases.setup]
-nixPkgs = ["nodejs_18", "python3", "ffmpeg"]
+  nixPkgs = ["nodejs_18"]
 
-[phases.install]
-cmds = ["npm install --legacy-peer-deps"]
+  [phases.install]
+  cmds = ["npm install --legacy-peer-deps"]
 
-[phases.build]
-cmds = ["node scripts/fix-esm.js"]
-
-[start]
-cmd = "node index.js"
+  [start]
+  cmd = "node index.js"
+  
