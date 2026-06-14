@@ -4,6 +4,6 @@ builder = "nixpacks"
 [deploy]
 startCommand = "node index.js"
 healthcheckPath = "/health"
-healthcheckTimeout = 180
+healthcheckTimeout = 300
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 15
+restartPolicyMaxRetries = 5
