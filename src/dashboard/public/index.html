@@ -250,32 +250,79 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;background:rgba(0,0,0,.
 /* ════ BOTTOM NAV ════ */
 .bottom-nav{
   display:none;position:fixed;bottom:0;left:0;right:0;z-index:500;
-  background:rgba(8,8,12,.82);
+  background:rgba(8,8,12,.88);
   -webkit-backdrop-filter:saturate(200%) blur(40px);backdrop-filter:saturate(200%) blur(40px);
   border-top:1px solid rgba(255,255,255,.08);
-  padding:10px 4px;padding-bottom:calc(10px + var(--safe-b));
-  justify-content:space-around;align-items:center;
+  padding:6px 8px;padding-bottom:calc(6px + var(--safe-b));
+  overflow-x:auto;overflow-y:hidden;
+  justify-content:flex-start;align-items:center;
+  gap:2px;
   box-shadow:0 -8px 40px rgba(0,0,0,.5);
+  scrollbar-width:none;
 }
+.bottom-nav::-webkit-scrollbar{display:none;}
 .bn{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:7px 10px;border-radius:14px;cursor:pointer;border:none;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 10px;border-radius:14px;cursor:pointer;border:none;
   background:transparent;color:rgba(255,255,255,.38);
   font-size:9px;font-weight:700;font-family:inherit;letter-spacing:.3px;
   transition:all .22s var(--spring);-webkit-tap-highlight-color:transparent;
-  min-width:50px;position:relative;
+  min-width:56px;flex-shrink:0;position:relative;
 }
-.bn-ic{font-size:22px;line-height:1;transition:transform .25s var(--spring);}
-.bn.active{color:var(--blue);}
-.bn.active .bn-ic{transform:scale(1.15);}
+.bn-ic{font-size:20px;line-height:1;transition:transform .25s var(--spring);}
+.bn.active{color:var(--blue);background:rgba(10,132,255,.1);border-radius:14px;}
+.bn.active .bn-ic{transform:scale(1.12);}
 .bn-indicator{
-  position:absolute;top:-2px;left:50%;
-  width:18px;height:3px;border-radius:3px;background:var(--blue);
+  position:absolute;top:-1px;left:50%;
+  width:16px;height:3px;border-radius:3px;background:var(--blue);
   transition:all .28s var(--spring);opacity:0;transform:translateX(-50%) scaleX(0);
 }
 .bn.active .bn-indicator{opacity:1;transform:translateX(-50%) scaleX(1);}
-.bn.messenger-bn.active{color:var(--purple);}
+.bn.messenger-bn.active{color:var(--purple);background:rgba(191,90,242,.1);}
 .bn.messenger-bn.active .bn-indicator{background:var(--purple);}
+
+/* ── Swipe hint ── */
+.swipe-hint{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:9000;pointer-events:none;
+  background:rgba(0,0,0,.75);border-radius:20px;padding:14px 20px;
+  font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;
+  opacity:0;transition:opacity .2s;white-space:nowrap;
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.12);
+}
+.swipe-hint.show{opacity:1;}
+
+/* ── Angel backgrounds per tab ── */
+.bg-angel-layer{
+  position:fixed;inset:0;z-index:-3;
+  background-size:cover;background-position:center;
+  opacity:0;transition:opacity .6s var(--ease),filter .6s;
+  filter:blur(3px) saturate(0.4);
+  will-change:opacity;
+}
+.bg-angel-layer.visible{opacity:.1;}
+.bg-tab-tint{
+  position:fixed;inset:0;z-index:-2;
+  transition:background .6s var(--ease);
+  pointer-events:none;
+}
+/* particles */
+.bg-particle{
+  position:fixed;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.4),transparent);
+  pointer-events:none;z-index:-1;
+  animation:particleDrift var(--dur,20s) ease-in-out infinite;
+  opacity:0;transition:opacity 1s;
+}
+.bg-particle.visible{opacity:var(--op,.08);}
+@keyframes particleDrift{
+  0%{transform:translate(0,0) scale(1);}
+  25%{transform:translate(var(--dx1,20px),var(--dy1,-30px)) scale(1.1);}
+  50%{transform:translate(var(--dx2,-15px),var(--dy2,-50px)) scale(.9);}
+  75%{transform:translate(var(--dx3,30px),var(--dy3,-20px)) scale(1.05);}
+  100%{transform:translate(0,0) scale(1);}
+}
 
 /* ════ FORMS ════ */
 .fg{margin-bottom:14px;}
@@ -767,11 +814,17 @@ input:checked+.slider::before{transform:translateX(21px);}
 <body>
 
 <div class="bg-canvas" aria-hidden="true">
+  <div class="bg-angel-layer" id="bgAngelLayer"></div>
+  <div class="bg-tab-tint" id="bgTabTint"></div>
+  <div class="bg-particle" id="bp1" style="width:220px;height:220px;top:10%;right:8%;--dur:18s;--op:.07;--dx1:25px;--dy1:-35px;--dx2:-20px;--dy2:-60px;--dx3:35px;--dy3:-15px;"></div>
+  <div class="bg-particle" id="bp2" style="width:160px;height:160px;bottom:20%;left:5%;--dur:24s;--op:.06;--dx1:-30px;--dy1:20px;--dx2:25px;--dy2:-40px;--dx3:-15px;--dy3:30px;"></div>
+  <div class="bg-particle" id="bp3" style="width:100px;height:100px;top:50%;left:50%;--dur:15s;--op:.05;--dx1:40px;--dy1:-20px;--dx2:-35px;--dy2:15px;--dx3:20px;--dy3:-30px;"></div>
   <div class="bg-orb bg-orb-1"></div>
   <div class="bg-orb bg-orb-2"></div>
   <div class="bg-orb bg-orb-3"></div>
   <div class="bg-orb bg-orb-4"></div>
 </div>
+<div class="swipe-hint" id="swipeHint"></div>
 
 <!-- ═══ LOGIN ═══════════════════════════════════════════════════════════════ -->
 <div id="login-screen">
@@ -807,7 +860,7 @@ input:checked+.slider::before{transform:translateX(21px);}
   </div>
 </header>
 
-<!-- ═══ BOTTOM NAV (mobile) ══════════════════════════════════════════════ -->
+<!-- ═══ BOTTOM NAV (mobile) — all 10 tabs, scrollable ═════════════════════ -->
 <nav class="bottom-nav" id="bottomNav">
   <button class="bn active" data-tab="control">
     <div class="bn-indicator"></div>
@@ -821,9 +874,17 @@ input:checked+.slider::before{transform:translateX(21px);}
     <div class="bn-indicator"></div>
     <span class="bn-ic">📦</span>أوامر
   </button>
+  <button class="bn" data-tab="activation">
+    <div class="bn-indicator"></div>
+    <span class="bn-ic">🎛</span>تفعيل
+  </button>
   <button class="bn" data-tab="editor">
     <div class="bn-indicator"></div>
     <span class="bn-ic">✏️</span>محرر
+  </button>
+  <button class="bn" data-tab="protection">
+    <div class="bn-indicator"></div>
+    <span class="bn-ic">🛡</span>حماية
   </button>
   <button class="bn" data-tab="settings">
     <div class="bn-indicator"></div>
@@ -832,6 +893,14 @@ input:checked+.slider::before{transform:translateX(21px);}
   <button class="bn" data-tab="cookies">
     <div class="bn-indicator"></div>
     <span class="bn-ic">🍪</span>كوكيز
+  </button>
+  <button class="bn" data-tab="messages">
+    <div class="bn-indicator"></div>
+    <span class="bn-ic">📨</span>رسائل
+  </button>
+  <button class="bn" data-tab="logs">
+    <div class="bn-indicator"></div>
+    <span class="bn-ic">📋</span>سجلات
   </button>
 </nav>
 
@@ -2261,8 +2330,117 @@ function toast(msg, type = "success", dur = 3000) {
   }, dur);
 }
 
+/* ═══════════════════════════════════════════════════
+   ANGEL BACKGROUNDS — per-tab theme system
+   ═══════════════════════════════════════════════════ */
+const TAB_THEMES = {
+  control:    { img:"/angel.png",  tint:"rgba(10,132,255,.08)",  orbColor:"#0A84FF" },
+  messenger:  { img:"/angel2.png", tint:"rgba(191,90,242,.10)", orbColor:"#BF5AF2" },
+  cookies:    { img:"/angel.png",  tint:"rgba(255,159,10,.07)",  orbColor:"#FF9F0A" },
+  commands:   { img:"/angel2.png", tint:"rgba(50,215,75,.07)",   orbColor:"#32D74B" },
+  activation: { img:"/angel.png",  tint:"rgba(90,200,250,.07)",  orbColor:"#5AC8FA" },
+  editor:     { img:"/angel2.png", tint:"rgba(10,132,255,.09)",  orbColor:"#0A84FF" },
+  protection: { img:"/angel.png",  tint:"rgba(50,215,75,.09)",   orbColor:"#32D74B" },
+  settings:   { img:"/angel2.png", tint:"rgba(255,69,58,.06)",   orbColor:"#FF453A" },
+  messages:   { img:"/angel.png",  tint:"rgba(191,90,242,.08)",  orbColor:"#BF5AF2" },
+  logs:       { img:"/angel2.png", tint:"rgba(255,214,10,.07)",  orbColor:"#FFD60A" },
+};
+
+function updateTabBackground(tab) {
+  const theme = TAB_THEMES[tab] || TAB_THEMES.control;
+  const layer = document.getElementById("bgAngelLayer");
+  const tint  = document.getElementById("bgTabTint");
+  if (layer) {
+    layer.style.backgroundImage = `url('${theme.img}')`;
+    layer.classList.add("visible");
+  }
+  if (tint) tint.style.background = theme.tint;
+  // Animate particles to theme color
+  document.querySelectorAll(".bg-particle").forEach(p => p.classList.add("visible"));
+}
+
+/* ═══════════════════════════════════════════════════
+   SWIPE GESTURE — navigate tabs by swiping left/right
+   ═══════════════════════════════════════════════════ */
+const TAB_ORDER = ["control","messenger","cookies","commands","activation","editor","protection","settings","messages","logs"];
+
+let _touchStartX = 0, _touchStartY = 0, _touchStartTime = 0;
+let _swipeHintTimer = null;
+
+document.addEventListener("touchstart", e => {
+  _touchStartX = e.changedTouches[0].screenX;
+  _touchStartY = e.changedTouches[0].screenY;
+  _touchStartTime = Date.now();
+}, { passive:true });
+
+document.addEventListener("touchend", e => {
+  const dx = e.changedTouches[0].screenX - _touchStartX;
+  const dy = e.changedTouches[0].screenY - _touchStartY;
+  const dt = Date.now() - _touchStartTime;
+
+  // Must be fast enough, horizontal enough, and long enough
+  if (dt > 600) return;                          // too slow
+  if (Math.abs(dx) < 55) return;                // too short
+  if (Math.abs(dy) > Math.abs(dx) * 0.75) return; // too vertical
+
+  // Don't swipe inside messenger chat messages
+  const target = e.target;
+  if (target.closest(".chat-messages") || target.closest(".log-box") ||
+      target.closest("textarea") || target.closest("input") || target.closest(".messenger-sidebar")) return;
+
+  const curIdx = TAB_ORDER.indexOf(_prevTab);
+  if (curIdx === -1) return;
+
+  // RTL: swipe right → previous (lower index), swipe left → next (higher index)
+  if (dx > 0 && curIdx > 0) {
+    const nextTab = TAB_ORDER[curIdx - 1];
+    switchTab(nextTab);
+    showSwipeHint("← " + getTabLabel(nextTab));
+  } else if (dx < 0 && curIdx < TAB_ORDER.length - 1) {
+    const nextTab = TAB_ORDER[curIdx + 1];
+    switchTab(nextTab);
+    showSwipeHint(getTabLabel(nextTab) + " →");
+  }
+}, { passive:true });
+
+function showSwipeHint(text) {
+  const el = document.getElementById("swipeHint");
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add("show");
+  clearTimeout(_swipeHintTimer);
+  _swipeHintTimer = setTimeout(() => el.classList.remove("show"), 900);
+}
+
+const TAB_LABELS = {
+  control:"الرئيسية", messenger:"مسنجر", cookies:"كوكيز", commands:"أوامر",
+  activation:"تفعيل", editor:"محرر", protection:"حماية",
+  settings:"إعدادات", messages:"رسائل", logs:"سجلات"
+};
+function getTabLabel(tab) { return TAB_LABELS[tab] || tab; }
+
+/* ═══════════════════════════════════════════════════
+   Hook switchTab to also update background + scroll nav
+   ═══════════════════════════════════════════════════ */
+const _origSwitchTab = switchTab;
+function switchTab(name) {
+  _origSwitchTab(name);
+  updateTabBackground(name);
+  // Scroll the active bn into view
+  requestAnimationFrame(() => {
+    const bn = document.querySelector(`.bn[data-tab="${name}"]`);
+    if (bn) bn.scrollIntoView({ behavior:"smooth", block:"nearest", inline:"center" });
+  });
+}
+
 /* ─── Init ───────────────────────────────────────── */
 (async function init() {
+  // Show angel background particles immediately
+  setTimeout(() => {
+    document.querySelectorAll(".bg-particle").forEach(p => p.classList.add("visible"));
+    updateTabBackground("control");
+  }, 300);
+
   if (_token) {
     const ok = await checkAuth();
     if (ok) { document.getElementById("login-screen").classList.add("hidden"); showApp(); }

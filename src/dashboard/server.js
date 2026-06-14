@@ -166,6 +166,16 @@ function startDashboard(port = 5000) {
   app.use(bodyParser.urlencoded({ extended: true, limit: "5mb" }));
   app.use(express.static(path.join(__dirname, "public")));
 
+  // ── Health check (Railway / Render / Heroku) ─────────────────────────────────
+  app.get("/health", (_, res) => res.json({ ok: true, status: "running", ts: Date.now() }));
+  app.get("/ping",   (_, res) => res.send("pong"));
+
+  // ── CORS & headers ──────────────────────────────────────────────────────────
+  app.use((req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    next();
+  });
+
   // ── Auth ────────────────────────────────────────────────────────────────────
   app.post("/api/login", (req, res) => {
     const { password } = req.body;
