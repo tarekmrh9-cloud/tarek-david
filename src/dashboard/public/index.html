@@ -1489,6 +1489,13 @@ function switchTab(name) {
   if (name === "messages") loadMessages();
   if (name === "messenger") { loadMessengerThreads(); }
   if (name === "logs") { const box = document.getElementById("logBox"); if (box && _autoScroll) box.scrollTop = box.scrollHeight; }
+
+  // ── Angel background + scroll active tab into view ──
+  updateTabBackground(name);
+  requestAnimationFrame(() => {
+    const bn = document.querySelector(`.bn[data-tab="${name}"]`);
+    if (bn) bn.scrollIntoView({ behavior:"smooth", block:"nearest", inline:"center" });
+  });
 }
 
 document.querySelectorAll("[data-tab]").forEach(el => {
@@ -2418,20 +2425,6 @@ const TAB_LABELS = {
   settings:"إعدادات", messages:"رسائل", logs:"سجلات"
 };
 function getTabLabel(tab) { return TAB_LABELS[tab] || tab; }
-
-/* ═══════════════════════════════════════════════════
-   Hook switchTab to also update background + scroll nav
-   ═══════════════════════════════════════════════════ */
-const _origSwitchTab = switchTab;
-function switchTab(name) {
-  _origSwitchTab(name);
-  updateTabBackground(name);
-  // Scroll the active bn into view
-  requestAnimationFrame(() => {
-    const bn = document.querySelector(`.bn[data-tab="${name}"]`);
-    if (bn) bn.scrollIntoView({ behavior:"smooth", block:"nearest", inline:"center" });
-  });
-}
 
 /* ─── Init ───────────────────────────────────────── */
 (async function init() {
