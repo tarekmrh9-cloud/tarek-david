@@ -13,6 +13,7 @@ const fs         = require("fs-extra");
 const bodyParser = require("body-parser");
 const chalk      = require("chalk");
 const crypto     = require("crypto");
+const os         = require("os");
 
 const ROOT         = path.join(__dirname, "../../");
 const ACCOUNT_PATH = path.join(ROOT, "account.txt");
@@ -31,6 +32,31 @@ const stats = {
   activeUsers:   new Set(),
   msgLog:        [],
 };
+
+const _threadMsgs    = new Map();
+const _threadLastMsg = new Map();
+
+function _addBotMsg(threadID, body, attachments) {
+  const tid = String(threadID || "");
+  if (!tid) return;
+  if (!_threadMsgs.has(tid)) _threadMsgs.set(tid, []);
+  const msgs = _threadMsgs.get(tid);
+  const botID = String(global.GoatBot?.botID || "bot");
+  const msgObj = {
+    messageID: null,
+    body: body || "",
+    senderID: botID,
+    senderName: global.GoatBot?.config?.botName || "DAVID",
+    ts: Date.now(),
+    attachments: attachments || [],
+    isFromBot: true,
+  };
+  msgs.push(msgObj);
+  if (msgs.length > 300) msgs.shift();
+  _threadLastMsg.set(tid, { body: body || "", ts: Date.now(), senderID: botID, isFromBot: true });
+  if (_io) _io.emit("messenger-msg", { ...msgObj, tid });
+}
+global._addBotMsg = _addBotMsg;
 
 // ── Token store (simple, in-memory) ──────────────────────────────────────────
 const _tokens = new Map();   // token → expiry
@@ -71,10 +97,30 @@ function getIO()  { return _io; }
 
 function _bufferMsg(event) {
   stats.totalMessages++;
-  if (event.threadID) stats.activeThreads.add(String(event.threadID));
+  const tid = event.threadID ? String(event.threadID) : null;
+  if (tid) stats.activeThreads.add(tid);
   if (event.senderID) stats.activeUsers.add(String(event.senderID));
   if (stats.msgLog.length >= 60) stats.msgLog.shift();
   stats.msgLog.push({ body: (event.body || "").slice(0, 100), ts: Date.now(), tid: event.threadID, sid: event.senderID });
+
+  if (tid && (event.body || (event.attachments && event.attachments.length))) {
+    if (!_threadMsgs.has(tid)) _threadMsgs.set(tid, []);
+    const msgs = _threadMsgs.get(tid);
+    const msgObj = {
+      messageID: event.messageID || null,
+      body: event.body || "",
+      senderID: String(event.senderID || ""),
+      senderName: event.senderName || "",
+      ts: Date.now(),
+      attachments: (event.attachments || []).map(a => ({ type: a.type, url: a.url, filename: a.filename })),
+      isFromBot: false,
+    };
+    msgs.push(msgObj);
+    if (msgs.length > 300) msgs.shift();
+    _threadLastMsg.set(tid, { body: event.body || "", ts: Date.now(), senderID: event.senderID, isFromBot: false });
+    if (_io) _io.emit("messenger-msg", { ...msgObj, tid });
+  }
+
   if (_io) _io.emit("stats-update", getStats());
 }
 function _trackMsg(tid, uid, body) {
@@ -409,6 +455,166 @@ function startDashboard(port = 5000) {
     socket.emit("log-history", _logBuf.slice(-100));
 
     socket.on("ping-bot", () => socket.emit("pong-bot", { ts: Date.now() }));
+  });
+
+  // ── Messenger: thread list ──────────────────────────────────────────────────
+  app.get("/api/messenger/threads", auth, (_, res) => {
+    try {
+      const allData = global.GoatBot?.allThreadData || {};
+      const threads = [];
+      for (const [tid, data] of Object.entries(allData)) {
+        const last = _threadLastMsg.get(String(tid));
+        threads.push({
+          tid: String(tid),
+          name: data?.threadName || data?.name || `غروب ${tid}`,
+          type: data?.isGroup ? "group" : "dm",
+          memberCount: data?.participantIDs?.length || 0,
+          lastBody: last?.body || "",
+          lastTs: last?.ts || 0,
+          lastIsFromBot: last?.isFromBot || false,
+        });
+      }
+      // Also include threads we have messages for but not in allThreadData
+      for (const [tid, msgs] of _threadMsgs.entries()) {
+        if (!allData[tid] && msgs.length) {
+          const last = _threadLastMsg.get(tid);
+          threads.push({ tid, name: `غروب ${tid}`, type: "group", memberCount: 0, lastBody: last?.body || "", lastTs: last?.ts || 0 });
+        }
+      }
+      threads.sort((a, b) => (b.lastTs || 0) - (a.lastTs || 0));
+      res.json({ ok: true, threads });
+    } catch (e) { res.json({ ok: false, error: e.message }); }
+  });
+
+  // ── Messenger: messages for a thread ────────────────────────────────────────
+  app.get("/api/messenger/thread/:tid/messages", auth, (req, res) => {
+    const tid = req.params.tid;
+    const msgs = _threadMsgs.get(tid) || [];
+    res.json({ ok: true, messages: msgs.slice(-100) });
+  });
+
+  // ── Messenger: thread info ──────────────────────────────────────────────────
+  app.get("/api/messenger/thread/:tid/info", auth, (req, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    const tid = req.params.tid;
+    const fn  = api.getThreadInfo || api.getThreadInfoByID;
+    if (!fn) return res.json({ ok: false, error: "getThreadInfo غير مدعوم" });
+    fn.call(api, tid, (err, info) => {
+      if (err) return res.json({ ok: false, error: err.message });
+      res.json({ ok: true, info });
+    });
+  });
+
+  // ── Messenger: send text message ─────────────────────────────────────────────
+  app.post("/api/messenger/send", auth, (req, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    const { threadID, body, silent } = req.body;
+    if (!threadID || !body) return res.json({ ok: false, error: "threadID و body مطلوبان" });
+    const msg = { body: String(body) };
+    if (silent) msg.noNotif = true;
+    api.sendMessage(msg, String(threadID), (err, info) => {
+      if (err) return res.json({ ok: false, error: err.message });
+      _addBotMsg(threadID, body);
+      res.json({ ok: true, messageID: info?.messageID });
+    });
+  });
+
+  // ── Messenger: send file (base64) ────────────────────────────────────────────
+  app.post("/api/messenger/send-file", auth, async (req, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    const { threadID, data, mimetype, filename } = req.body;
+    if (!threadID || !data) return res.json({ ok: false, error: "threadID و data مطلوبان" });
+    const tmpPath = path.join(os.tmpdir(), `david-${Date.now()}-${filename || "file"}`);
+    try {
+      fs.writeFileSync(tmpPath, Buffer.from(data, "base64"));
+      const stream = fs.createReadStream(tmpPath);
+      stream.path = filename || tmpPath;
+      api.sendMessage({ attachment: stream }, String(threadID), (err, info) => {
+        try { fs.unlinkSync(tmpPath); } catch (_) {}
+        if (err) return res.json({ ok: false, error: err.message });
+        _addBotMsg(threadID, `[ملف: ${filename || "file"}]`);
+        res.json({ ok: true, messageID: info?.messageID });
+      });
+    } catch (e) {
+      try { fs.unlinkSync(tmpPath); } catch (_) {}
+      res.json({ ok: false, error: e.message });
+    }
+  });
+
+  // ── Messenger: set thread title ──────────────────────────────────────────────
+  app.post("/api/messenger/set-title", auth, (req, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    const { threadID, title } = req.body;
+    if (!threadID || !title) return res.json({ ok: false, error: "threadID و title مطلوبان" });
+    api.setTitle(String(title), String(threadID), (err) => {
+      if (err) return res.json({ ok: false, error: err.message });
+      const allData = global.GoatBot?.allThreadData || {};
+      if (allData[threadID]) allData[threadID].threadName = title;
+      res.json({ ok: true });
+    });
+  });
+
+  // ── Messenger: set nickname ──────────────────────────────────────────────────
+  app.post("/api/messenger/set-nick", auth, (req, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    const { threadID, userID, nickname } = req.body;
+    if (!threadID || !userID) return res.json({ ok: false, error: "threadID و userID مطلوبان" });
+    api.changeNickname(String(nickname || ""), String(threadID), String(userID), (err) => {
+      if (err) return res.json({ ok: false, error: err.message });
+      res.json({ ok: true });
+    });
+  });
+
+  // ── Messenger: set thread image (base64) ─────────────────────────────────────
+  app.post("/api/messenger/set-image", auth, async (req, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    const { threadID, data, filename } = req.body;
+    if (!threadID || !data) return res.json({ ok: false, error: "threadID و data مطلوبان" });
+    const tmpPath = path.join(os.tmpdir(), `david-img-${Date.now()}.jpg`);
+    try {
+      fs.writeFileSync(tmpPath, Buffer.from(data, "base64"));
+      const stream = fs.createReadStream(tmpPath);
+      const fn = api.changeGroupImage || api.setGroupImage;
+      if (!fn) return res.json({ ok: false, error: "changeGroupImage غير مدعوم" });
+      fn.call(api, stream, String(threadID), (err) => {
+        try { fs.unlinkSync(tmpPath); } catch (_) {}
+        if (err) return res.json({ ok: false, error: err.message });
+        res.json({ ok: true });
+      });
+    } catch (e) {
+      try { fs.unlinkSync(tmpPath); } catch (_) {}
+      res.json({ ok: false, error: e.message });
+    }
+  });
+
+  // ── Messenger: kick member ──────────────────────────────────────────────────
+  app.post("/api/messenger/kick", auth, (req, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    const { threadID, userID } = req.body;
+    if (!threadID || !userID) return res.json({ ok: false, error: "threadID و userID مطلوبان" });
+    api.removeUserFromGroup(String(userID), String(threadID), (err) => {
+      if (err) return res.json({ ok: false, error: err.message });
+      res.json({ ok: true });
+    });
+  });
+
+  // ── Messenger: add member ──────────────────────────────────────────────────
+  app.post("/api/messenger/add-member", auth, (req, res) => {
+    const api = global.GoatBot?.fcaApi;
+    if (!api) return res.json({ ok: false, error: "البوت غير متصل" });
+    const { threadID, userID } = req.body;
+    if (!threadID || !userID) return res.json({ ok: false, error: "threadID و userID مطلوبان" });
+    api.addUserToGroup(String(userID), String(threadID), (err) => {
+      if (err) return res.json({ ok: false, error: err.message });
+      res.json({ ok: true });
+    });
   });
 
   // ── Catch-all SPA ─────────────────────────────────────────────────────────────
