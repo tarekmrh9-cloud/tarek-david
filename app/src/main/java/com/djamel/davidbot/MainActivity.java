@@ -246,12 +246,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (webView != null) webView.onResume();
         startBotStatusMonitor();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        if (webView != null) webView.onPause();
         stopBotStatusMonitor();
     }
 
@@ -1798,8 +1800,6 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    @Override protected void onPause()  { super.onPause();  webView.onPause(); }
-    @Override protected void onResume() { super.onResume(); webView.onResume(); }
     @Override protected void onDestroy() {
         releaseWakeLock();
         if (webView != null) { webView.stopLoading(); webView.destroy(); }
