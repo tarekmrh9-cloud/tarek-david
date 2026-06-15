@@ -707,7 +707,11 @@ public class MainActivity extends AppCompatActivity {
         addDivider(content);
 
         // ── Hosting Mode (Railway / Phone) ──
-        addSectionLabel(content, "🚀 نشر البوت");
+        addSectionLabel(content, "📡 تشغيل البوت");
+
+        LinearLayout hostBtn = makeActionBtn("📱  الهاتف كسيرفر (Termux)", "#32D74B");
+        hostBtn.setOnClickListener(v -> { drawerLayout.closeDrawer(drawerPanel); showPhoneAsHostDialog(); });
+        content.addView(hostBtn);
 
         LinearLayout railBtn = makeActionBtn("🚂  Railway — نشر على السحابة", "#6366F1");
         railBtn.setOnClickListener(v -> {
@@ -715,10 +719,6 @@ public class MainActivity extends AppCompatActivity {
             showRailwayDialog();
         });
         content.addView(railBtn);
-
-        LinearLayout hostBtn = makeActionBtn("📱  الهاتف كسيرفر (محلي)", "#32D74B");
-        hostBtn.setOnClickListener(v -> { drawerLayout.closeDrawer(drawerPanel); showPhoneAsHostDialog(); });
-        content.addView(hostBtn);
 
         addDivider(content);
 
@@ -889,7 +889,7 @@ public class MainActivity extends AppCompatActivity {
         scroll.addView(layout);
 
         layout.addView(makeLabel("🔗 رابط السيرفر"));
-        EditText urlInput = makeInput(active.url, "https://xxx.railway.app");
+        EditText urlInput = makeInput(active.url, "http://localhost:5000  أو  https://xxx.railway.app");
         layout.addView(urlInput);
 
         layout.addView(makeLabel("🏷️ اسم هذا الملف الشخصي"));
@@ -929,7 +929,7 @@ public class MainActivity extends AppCompatActivity {
         scroll.addView(layout);
 
         layout.addView(makeLabel("🔗 رابط السيرفر"));
-        EditText urlInput = makeInput("", "https://xxx.railway.app  أو  http://localhost:5000");
+        EditText urlInput = makeInput("", "http://localhost:5000  أو  https://xxx.railway.app");
         layout.addView(urlInput);
 
         layout.addView(makeLabel("🏷️ اسم البوت"));
@@ -1239,10 +1239,59 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(wakeCard);
         // ────────────────────────────────────────────────────────────────
 
+        // ─── Auto-set localhost button ────────────────────────────────────
+        LinearLayout autoCard = new LinearLayout(this);
+        autoCard.setOrientation(LinearLayout.VERTICAL);
+        autoCard.setBackground(makeRoundRect(dp(14), Color.parseColor("#0A2A0A")));
+        autoCard.setPadding(dp(14), dp(14), dp(14), dp(14));
+        LinearLayout.LayoutParams acLp = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        acLp.bottomMargin = dp(10);
+        autoCard.setLayoutParams(acLp);
+
+        TextView autoTitle = new TextView(this);
+        autoTitle.setText("⚡  ضبط تلقائي للرابط المحلي");
+        autoTitle.setTextSize(14);
+        autoTitle.setTypeface(null, Typeface.BOLD);
+        autoTitle.setTextColor(Color.parseColor("#32D74B"));
+        autoCard.addView(autoTitle);
+
+        TextView autoBody = new TextView(this);
+        autoBody.setText("إذا كنت تشغّل البوت على نفس الهاتف عبر Termux، اضغط لضبط الرابط تلقائياً.");
+        autoBody.setTextSize(12);
+        autoBody.setTextColor(Color.parseColor("#EBEBF5"));
+        autoBody.setLineSpacing(0, 1.4f);
+        LinearLayout.LayoutParams abLp = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        abLp.topMargin = dp(4); abLp.bottomMargin = dp(10);
+        autoBody.setLayoutParams(abLp);
+        autoCard.addView(autoBody);
+
+        android.widget.Button autoBtn = new android.widget.Button(this);
+        autoBtn.setText("📱 ضبط http://localhost:5000");
+        autoBtn.setTextSize(12);
+        autoBtn.setTypeface(null, Typeface.BOLD);
+        autoBtn.setTextColor(Color.BLACK);
+        autoBtn.setBackground(makeRoundRect(dp(10), Color.parseColor("#32D74B")));
+        LinearLayout.LayoutParams ab2 = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        autoBtn.setLayoutParams(ab2);
+        autoBtn.setOnClickListener(vv -> {
+            BotProfile active = getActiveProfile();
+            active.url = "http://localhost:5000";
+            saveProfiles();
+            loadUrl("http://localhost:5000");
+            buildDrawerContent();
+            Toast.makeText(this, "✅ تم ضبط الرابط: http://localhost:5000", Toast.LENGTH_LONG).show();
+        });
+        autoCard.addView(autoBtn);
+        layout.addView(autoCard);
+        // ─────────────────────────────────────────────────────────────────
+
         new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setTitle("📡 استخدام الهاتف كسيرفر")
+            .setTitle("📡 الهاتف كسيرفر (Termux)")
             .setView(scroll)
-            .setPositiveButton("⚙️ ضبط الرابط", (d, which) -> showSettingsDialog())
+            .setPositiveButton("⚙️ ضبط الرابط يدوياً", (d, which) -> showSettingsDialog())
             .setNeutralButton("📥 تحميل Termux", (d, which) -> {
                 try {
                     startActivity(new Intent(Intent.ACTION_VIEW,
@@ -1265,54 +1314,72 @@ public class MainActivity extends AppCompatActivity {
             "body{background:#050508;color:#fff;font-family:-apple-system,system-ui,'Segoe UI',sans-serif;" +
             "min-height:100vh;display:flex;flex-direction:column;align-items:center;" +
             "justify-content:center;gap:12px;padding:30px 20px;text-align:center;overflow-x:hidden}" +
-            ".icon-wrap{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(255,69,58,.2),rgba(255,69,58,0));" +
+            ".icon-wrap{width:90px;height:90px;border-radius:50%;" +
+            "background:radial-gradient(circle,rgba(255,69,58,.22),rgba(255,69,58,0));" +
             "display:flex;align-items:center;justify-content:center;font-size:42px;" +
             "animation:pulse 2s ease-in-out infinite}" +
-            "@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.8}}" +
-            "h2{font-size:22px;font-weight:800;background:linear-gradient(135deg,#FF453A,#FF9F0A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:4px}" +
-            "p.sub{color:rgba(255,255,255,.45);font-size:12.5px;line-height:1.6;max-width:300px}" +
-            ".url-box{background:rgba(10,132,255,.1);border:1px solid rgba(10,132,255,.25);border-radius:12px;" +
+            "@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.75}}" +
+            "h2{font-size:22px;font-weight:800;background:linear-gradient(135deg,#FF453A,#FF9F0A);" +
+            "-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:4px}" +
+            "p.sub{color:rgba(255,255,255,.42);font-size:12.5px;line-height:1.6;max-width:300px}" +
+            ".url-box{background:rgba(10,132,255,.09);border:1px solid rgba(10,132,255,.22);border-radius:12px;" +
             "padding:9px 14px;font-size:11px;color:#5AC8FA;word-break:break-all;max-width:100%;width:90%}" +
-            ".card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;" +
-            "padding:14px 16px;width:100%;max-width:340px;text-align:right}" +
-            ".card-title{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:10px;text-align:center;letter-spacing:.5px}" +
-            ".mode-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}" +
+            ".card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:18px;" +
+            "padding:14px 16px;width:100%;max-width:340px;text-align:right;" +
+            "-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}" +
+            ".card-title{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:10px;text-align:center;letter-spacing:.8px;text-transform:uppercase}" +
+            ".mode-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}" +
             ".mode-row:last-child{border-bottom:none;padding-bottom:0}" +
-            ".mode-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}" +
-            ".mode-name{font-size:12.5px;font-weight:600;color:#fff;flex:1}" +
-            ".mode-desc{font-size:10.5px;color:rgba(255,255,255,.4)}" +
-            ".d-rail{background:linear-gradient(135deg,#6366F1,#8B5CF6)}" +
-            ".d-phone{background:#32D74B}.d-replit{background:#0A84FF}" +
+            ".mode-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}" +
+            ".mode-info{flex:1}" +
+            ".mode-name{font-size:13px;font-weight:700;color:#fff}" +
+            ".mode-desc{font-size:10.5px;color:rgba(255,255,255,.38);margin-top:1px}" +
+            ".mode-rec{font-size:9.5px;font-weight:700;color:#32D74B;background:rgba(50,215,75,.12);" +
+            "border:1px solid rgba(50,215,75,.25);border-radius:6px;padding:1px 6px;margin-right:6px}" +
+            ".d-phone{background:#32D74B;color:#32D74B}" +
+            ".d-rail{background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#8B5CF6}" +
+            ".d-replit{background:#0A84FF;color:#0A84FF}" +
             ".btns{display:flex;flex-direction:column;gap:8px;width:100%;max-width:340px}" +
-            ".btn{width:100%;border:none;border-radius:14px;padding:14px 20px;" +
-            "font-size:14px;font-weight:700;cursor:pointer;color:#fff;text-align:center;letter-spacing:.2px}" +
-            ".btn:active{opacity:.6;transform:scale(.98)}" +
-            ".b-retry{background:linear-gradient(135deg,#0A84FF,#5AC8FA);box-shadow:0 4px 20px rgba(10,132,255,.35)}" +
-            ".b-railway{background:linear-gradient(135deg,#6366F1,#8B5CF6)}" +
-            ".b-phone{background:rgba(50,215,75,.12);border:1px solid rgba(50,215,75,.3);color:#32D74B}" +
-            ".b-settings{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7)}" +
-            ".b-drawer{background:rgba(191,90,242,.12);border:1px solid rgba(191,90,242,.25);color:#BF5AF2}" +
-            ".sep{width:28px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;margin:2px auto}" +
-            ".ver{font-size:10px;color:rgba(255,255,255,.15);margin-top:8px}" +
+            ".btn{width:100%;border:none;border-radius:15px;padding:14px 20px;" +
+            "font-size:14px;font-weight:700;cursor:pointer;color:#fff;text-align:center;" +
+            "letter-spacing:.2px;transition:opacity .15s}" +
+            ".btn:active{opacity:.6;transform:scale(.97)}" +
+            ".b-phone{background:linear-gradient(135deg,#32D74B,#30D158);color:#000;" +
+            "box-shadow:0 4px 20px rgba(50,215,75,.4)}" +
+            ".b-retry{background:linear-gradient(135deg,#0A84FF,#5AC8FA);box-shadow:0 4px 20px rgba(10,132,255,.3)}" +
+            ".b-railway{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#A5B4FC}" +
+            ".b-settings{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65)}" +
+            ".b-drawer{background:rgba(191,90,242,.1);border:1px solid rgba(191,90,242,.22);color:#BF5AF2}" +
+            ".sep{width:28px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;margin:2px auto}" +
+            ".ver{font-size:10px;color:rgba(255,255,255,.13);margin-top:8px}" +
             "</style></head><body>" +
             "<div class='icon-wrap'>📡</div>" +
             "<h2>تعذّر الاتصال</h2>" +
-            "<p class='sub'>لا يمكن الوصول إلى البوت<br>تحقق من الرابط ووضع الاستضافة</p>" +
+            "<p class='sub'>لا يمكن الوصول إلى البوت<br>تأكد أن Termux يعمل أو تحقق من الرابط</p>" +
             "<div class='url-box'>" + url + "</div>" +
             "<div class='card'>" +
-            "<div class='card-title'>▾ خيارات الاستضافة</div>" +
-            "<div class='mode-row'><div class='mode-dot d-rail'></div><div><div class='mode-name'>Railway</div><div class='mode-desc'>سحابي 24/7 — مجاني على railway.app</div></div></div>" +
-            "<div class='mode-row'><div class='mode-dot d-phone'></div><div><div class='mode-name'>الهاتف</div><div class='mode-desc'>Termux محلي على نفس الجهاز</div></div></div>" +
-            "<div class='mode-row'><div class='mode-dot d-replit'></div><div><div class='mode-name'>Replit</div><div class='mode-desc'>تشغيل مباشر على منصة Replit</div></div></div>" +
+            "<div class='card-title'>وضع الاستضافة</div>" +
+            "<div class='mode-row'>" +
+            "<div class='mode-dot d-phone'></div>" +
+            "<div class='mode-info'><div class='mode-name'><span class='mode-rec'>موصى</span>الهاتف / Termux</div>" +
+            "<div class='mode-desc'>node index.js  ←  شغّله في Termux</div></div></div>" +
+            "<div class='mode-row'>" +
+            "<div class='mode-dot d-rail'></div>" +
+            "<div class='mode-info'><div class='mode-name'>Railway</div>" +
+            "<div class='mode-desc'>سحابي 24/7 — railway.app</div></div></div>" +
+            "<div class='mode-row'>" +
+            "<div class='mode-dot d-replit'></div>" +
+            "<div class='mode-info'><div class='mode-name'>Replit</div>" +
+            "<div class='mode-desc'>تشغيل مباشر من المتصفح</div></div></div>" +
             "</div>" +
             "<div class='btns'>" +
-            "<button class='btn b-retry' onclick='location.reload()'>🔄 إعادة المحاولة</button>" +
-            "<button class='btn b-railway' onclick='Android.openRailwayHelp()'>🚂 كيفية النشر على Railway</button>" +
             (isLocal ?
-            "<button class='btn b-phone' onclick='Android.openPhoneHostHelp()'>📱 إعداد الهاتف كسيرفر</button>" :
+            "<button class='btn b-phone' onclick='Android.openPhoneHostHelp()'>📱 إعداد Termux كسيرفر</button>" :
             "<button class='btn b-phone' onclick='Android.openPhoneHostHelp()'>📱 استخدام الهاتف كسيرفر</button>") +
+            "<button class='btn b-retry' onclick='location.reload()'>🔄 إعادة المحاولة</button>" +
             "<div class='sep'></div>" +
             "<button class='btn b-settings' onclick='Android.openSettings()'>⚙️ تغيير رابط السيرفر</button>" +
+            "<button class='btn b-railway' onclick='Android.openRailwayHelp()'>🚂 النشر على Railway</button>" +
             "<button class='btn b-drawer' onclick='Android.openDrawer()'>☰ اختر بوتاً آخر</button>" +
             "</div>" +
             "<div class='ver'>DAVID V1 — v5.0</div>" +
