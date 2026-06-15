@@ -1,36 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
     android:fitsSystemWindows="false">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh"
+    <!-- ── Main Content ── -->
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/content_root"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:fitsSystemWindows="false">
 
-        <WebView
-            android:id="@+id/web_view"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#000000"
-            android:overScrollMode="never"
-            android:scrollbarStyle="outsideOverlay"
-            android:fadeScrollbars="true" />
+            android:layout_height="match_parent">
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            <WebView
+                android:id="@+id/web_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#000000"
+                android:overScrollMode="never"
+                android:scrollbarStyle="outsideOverlay"
+                android:fadeScrollbars="true" />
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:layout_gravity="top"
-        android:progressTint="#0A84FF"
-        android:progressBackgroundTint="#000000"
-        android:visibility="gone"
-        android:max="100" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_gravity="top"
+            android:progressTint="#0A84FF"
+            android:progressBackgroundTint="#000000"
+            android:visibility="gone"
+            android:max="100" />
+
+        <!-- ── Floating Menu Button — always on top, outside WebView ── -->
+        <TextView
+            android:id="@+id/fab_menu"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="top|start"
+            android:layout_margin="12dp"
+            android:gravity="center"
+            android:text="☰"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF"
+            android:elevation="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/fab_menu_bg" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <!-- ── Side Drawer (start = right in RTL Arabic) ── -->
+    <LinearLayout
+        android:id="@+id/drawer_panel"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:orientation="vertical"
+        android:background="#111111"
+        android:fitsSystemWindows="true"
+        android:elevation="16dp" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

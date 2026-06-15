@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar        progressBar;
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout       drawerPanel;
+    private TextView           fabMenu;
 
     // ── State ────────────────────────────────────────────────────────────
     private SharedPreferences prefs;
@@ -229,12 +230,14 @@ public class MainActivity extends AppCompatActivity {
         swipeRefresh = findViewById(R.id.swipe_refresh);
         webView      = findViewById(R.id.web_view);
         drawerPanel  = findViewById(R.id.drawer_panel);
+        fabMenu      = findViewById(R.id.fab_menu);
 
         loadProfiles();
         loadAvatarAndName();
         setupWebView();
         buildDrawerContent();
         setupSwipeRefresh();
+        setupFabMenu();
         requestNeededPermissions();
         loadUrl(getActiveUrl());
         startBotStatusMonitor();
@@ -434,16 +437,20 @@ public class MainActivity extends AppCompatActivity {
             "body.android-app input,body.android-app textarea,body.android-app select{font-size:16px!important}" +
             "';" +
             "document.head&&document.head.appendChild(s);}" +
-            // Swipe handle indicator (left edge)
+            // Swipe handle indicator (right edge — RTL Arabic drawer side)
             "if(!window._drawerHint){window._drawerHint=true;" +
             "var h=document.createElement('div');" +
             "h.id='_dv_handle';" +
-            "h.style.cssText='position:fixed;left:0;top:50%;transform:translateY(-50%);" +
-            "width:4px;height:56px;background:var(--app-accent," + accent + ");" +
-            "border-radius:0 6px 6px 0;opacity:.45;z-index:9999;cursor:pointer;" +
-            "transition:opacity .2s,width .2s';" +
-            "h.onmouseenter=function(){this.style.opacity='.75';this.style.width='6px'};" +
-            "h.onmouseleave=function(){this.style.opacity='.45';this.style.width='4px'};" +
+            "h.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);" +
+            "width:5px;height:64px;background:var(--app-accent," + accent + ");" +
+            "border-radius:6px 0 0 6px;opacity:.4;z-index:9999;cursor:pointer;" +
+            "transition:opacity .2s,width .2s,height .2s';" +
+            "h.addEventListener('touchstart',function(e){" +
+            "this.style.opacity='.85';this.style.width='8px';this.style.height='80px';},false);" +
+            "h.addEventListener('touchend',function(e){" +
+            "e.preventDefault();" +
+            "this.style.opacity='.4';this.style.width='5px';this.style.height='64px';" +
+            "if(window.Android)Android.openDrawer();},false);" +
             "h.onclick=function(){if(window.Android)Android.openDrawer();};" +
             "document.body&&document.body.appendChild(h);}" +
             // Bind copy button to Android bridge
@@ -1626,6 +1633,48 @@ public class MainActivity extends AppCompatActivity {
         );
         swipeRefresh.setBackgroundColor(Color.BLACK);
         swipeRefresh.setOnRefreshListener(() -> webView.reload());
+    }
+
+    // ── Floating Menu Button Setup ────────────────────────────────────────
+    private void setupFabMenu() {
+        if (fabMenu == null) return;
+
+        // Apply iOS 26 press animation
+        addPressAnim(fabMenu);
+
+        // Set top margin below status bar
+        int sbH = getStatusBarHeight();
+        if (fabMenu.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
+            androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams lp =
+                (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) fabMenu.getLayoutParams();
+            lp.setMargins(dp(12), sbH + dp(8), dp(12), 0);
+            fabMenu.setLayoutParams(lp);
+        }
+
+        // Toggle drawer on click
+        fabMenu.setOnClickListener(v -> {
+            if (drawerLayout.isDrawerOpen(drawerPanel))
+                drawerLayout.closeDrawer(drawerPanel);
+            else
+                drawerLayout.openDrawer(drawerPanel);
+        });
+
+        // Update FAB icon when drawer state changes
+        drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                fabMenu.setText("✕");
+            }
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                fabMenu.setText("☰");
+            }
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                // Fade FAB while drawer is sliding
+                fabMenu.setAlpha(1f - slideOffset * 0.5f);
+            }
+        });
     }
 
     private void loadUrl(String url) {
