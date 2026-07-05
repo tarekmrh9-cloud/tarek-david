@@ -1,0 +1,128 @@
+name: Build DAVID V1 APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Licenses & Install SDK Platform
+        run: |
+          yes | sdkmanager --licenses 2>/dev/null || true
+          sdkmanager "platforms;android-36" "build-tools;34.0.0" "platform-tools" 2>/dev/null || \
+          sdkmanager "platforms;android-35" "build-tools;34.0.0" "platform-tools" 2>/dev/null || true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+          cache-read-only: false
+
+      - name: Build Debug APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon --stacktrace -Dorg.gradle.jvmargs="-Xmx1536m"
+
+      - name: Verify APK exists
+        run: |
+          find android/app/build/outputs/apk -name "*.apk" | tee /tmp/apk_list.txt
+          if [ ! -s /tmp/apk_list.txt ]; then echo "ERROR: No APK built!"; exit 1; fi
+
+      - name: Prepare release APK
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/david-v1.apk
+          ls -lh dist/
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: david-v1-apk
+          path: dist/david-v1.apk
+          retention-days: 90
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-build-${{ github.run_number }}
+          name: "📱 DAVID V1 v5.1 — APK Build #${{ github.run_number }}"
+          draft: false
+          prerelease: false
+          make_latest: true
+          body: |
+            ## 📱 DAVID V1 v5.1 — تطبيق Android
+
+            > تحميل مباشر ← انقر على **`david-v1.apk`** أدناه
+
+            ---
+
+            ### 🔄 ما الجديد في v5.1:
+            - ✅ **زر ☰ ثابت** على الشاشة — يفتح القائمة من أي مكان حتى من صفحة الخطأ
+            - ✅ **إصلاح القائمة الجانبية** — كانت لا تظهر في بعض الأجهزة
+            - ✅ **شريط الحافة اليمنى** محسّن — أكبر وأسهل في اللمس (RTL)
+            - ✅ **محرك البوت** — تشغيل Termux مباشرة بدون نافذة
+            - ✅ **iOS 26 Spring animations** — كل الأزرار بضغطة أصيلة
+            - ✅ **طلبات الرسائل** — بطاقات زجاجية مع قبول/رفض/تجاهل
+            - ✅ **/nick v6** — حلقة مستمرة كل 3.5–5 ثوانٍ
+
+            ---
+
+            ### 📥 خطوات التثبيت على OPPO / ColorOS:
+            1. **حمّل** ملف `david-v1.apk`
+            2. **الإعدادات** ← **الأمان** ← **تثبيت التطبيقات من مصادر غير معروفة** (فعّل للمتصفح أو مدير الملفات)
+            3. **افتح** ملف APK وثبّت
+            4. **شغّل** التطبيق ← اضغط **☰** أعلى اليسار لفتح القائمة
+            5. أدخل رابط السيرفر ← كلمة السر: **`david2025`**
+
+            ---
+
+            ### 🗂️ كيفية فتح القائمة الجانبية:
+            | الطريقة | الوصف |
+            |---------|-------|
+            | زر **☰** أعلى اليسار | الأسرع — متاح دائماً |
+            | شريط الحافة اليمنى | مرر من اليمين (RTL عربي) |
+
+            ---
+
+            ### 🔌 روابط السيرفر الشائعة:
+            | النوع | الرابط |
+            |-------|--------|
+            | Railway | `https://اسم-مشروعك.railway.app` |
+            | Termux (نفس الشبكة) | `http://192.168.x.x:5000` |
+            | Termux (نفس الهاتف) | `http://localhost:5000` |
+
+            ---
+
+            ### ✨ كل ميزات التطبيق:
+            - ☰ قائمة جانبية — زر ثابت يفتحها دائماً
+            - 💬 مسنجر حي مع إرسال صور وصوت
+            - 📨 طلبات الرسائل مع قبول/رفض
+            - 📊 لوحة تحكم كاملة مع سجل مباشر
+            - 📦 إدارة الأوامر
+            - ✏️ /nick — تغيير كنية البوت في كل الغروبات دفعةً واحدة
+            - 🤖 محرك البوت — تشغيل Termux في الخلفية
+            - 📡 الهاتف كسيرفر مع WakeLock
+            - 🤖 ذكاء اصطناعي Claude
+            - 📱 دعم ColorOS / OPPO / Android 16
+          files: dist/david-v1.apk
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
