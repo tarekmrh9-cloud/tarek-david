@@ -20,7 +20,7 @@ function apiReq(method, endpoint, data) {
       method,
       headers: {
         "Authorization": `token ${TOKEN}`,
-        "User-Agent": "DAVID-V1-Pusher/1.0",
+        "User-Agent": "AIZEN-V2-Pusher/1.0",
         "Accept": "application/vnd.github.v3+json",
         "Content-Type": "application/json",
         ...(body ? { "Content-Length": Buffer.byteLength(body) } : {}),

@@ -1,8 +1,8 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
- * ║           DAVID V1 — DjamelBot Engine (المحرك الرئيسي)         ║
- * ║           Copyright © 2025 DJAMEL — All rights reserved        ║
- * ║           Version 2.0 | Engine: DAVID                          ║
+ * ║           AIZEN V2 — DjamelBot Engine (المحرك الرئيسي)         ║
+ * ║           Copyright © 2025 SHIGA — All rights reserved        ║
+ * ║           Version 2.0 | Engine: AIZEN                          ║
  * ╚══════════════════════════════════════════════════════════════════╝
  */
 "use strict";
@@ -21,8 +21,8 @@
   }
 })();
 
-process.on("unhandledRejection", e => { try { (global.log?.error || console.error)("DAVID", e?.message || String(e)); } catch (_) {} });
-process.on("uncaughtException",  e => { try { (global.log?.error || console.error)("DAVID", e?.message || String(e)); } catch (_) {} });
+process.on("unhandledRejection", e => { try { (global.log?.error || console.error)("AIZEN", e?.message || String(e)); } catch (_) {} });
+process.on("uncaughtException",  e => { try { (global.log?.error || console.error)("AIZEN", e?.message || String(e)); } catch (_) {} });
 
 const fs       = require("fs-extra");
 const path     = require("path");
@@ -30,7 +30,7 @@ const chalk    = require("chalk");
 const gradient = require("gradient-string");
 const moment   = require("moment-timezone");
 
-const DjamelFCA                   = require("./Djamel-fca");
+const DjamelFCA                   = require("./shiga-fca");
 const { initGlobals }             = require("./src/engine/core");
 const { loadCommands }            = require("./src/engine/loader");
 const handlerEvents               = require("./src/engine/handlerEvents");
@@ -88,9 +88,9 @@ function printBanner() {
 ╚═════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝       ╚═══╝   ╚═╝`;
   console.log(gradient.pastel(art));
   console.log(chalk.hex("#00b4d8")("  ═".repeat(30)));
-  console.log(chalk.hex("#ffd166")(`  Developer  : DJAMEL`));
-  console.log(chalk.hex("#06d6a0")(`  Engine     : DAVID v2.0`));
-  console.log(chalk.hex("#90e0ef")(`  Library    : Djamel-fca v3.0`));
+  console.log(chalk.hex("#ffd166")(`  Developer  : SHIGA`));
+  console.log(chalk.hex("#06d6a0")(`  Engine     : AIZEN V2.0`));
+  console.log(chalk.hex("#90e0ef")(`  Library    : shiga-fca v3.0`));
   console.log(chalk.hex("#ff6b6b")(`  Framework  : WHITE V3 + Jarfis Merged`));
   console.log(chalk.hex("#00b4d8")(`  Port       : ${PORT}`));
   console.log(chalk.hex("#00b4d8")("  ═".repeat(30)));
@@ -291,7 +291,7 @@ async function startBot() {
       global.api            = api;
 
       // اسم البوت
-      let botName = config.botName || "DAVID V1";
+      let botName = config.botName || "AIZEN V2";
       try {
         const info = await new Promise((res, rej) =>
           api.getUserInfo(uid, (e, d) => e ? rej(e) : res(d)));
@@ -307,9 +307,9 @@ async function startBot() {
       console.log(`  │  ${chalk.yellow("UID:")}      ${chalk.white(uid.padEnd(35))}│`);
       console.log(`  │  ${chalk.yellow("Prefix:")}   ${chalk.white((config.prefix||"/").padEnd(35))}│`);
       console.log(`  │  ${chalk.yellow("Commands:")} ${chalk.white(String(global.GoatBot.commands.size).padEnd(35))}│`);
-      console.log(`  │  ${chalk.yellow("Engine:")}   ${chalk.white("DAVID v2 — 20 Protection Layers".padEnd(35))}│`);
+      console.log(`  │  ${chalk.yellow("Engine:")}   ${chalk.white("AIZEN V2 — 20 Protection Layers".padEnd(35))}│`);
       console.log(`  │  ${chalk.yellow("Port:")}     ${chalk.white(String(PORT).padEnd(35))}│`);
-      console.log(`  │  ${chalk.yellow("By:")}       ${chalk.white("DJAMEL".padEnd(35))}│`);
+      console.log(`  │  ${chalk.yellow("By:")}       ${chalk.white("SHIGA".padEnd(35))}│`);
       console.log(chalk.hex("#00b4d8")("  └──────────────────────────────────────────┘"));
       console.log();
 

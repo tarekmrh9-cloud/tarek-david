@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — SQLite Connection
- * Copyright © DJAMEL
+ * AIZEN V2 — SQLite Connection
+ * Copyright © SHIGA
  */
 
 "use strict";

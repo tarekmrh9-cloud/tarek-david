@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Global Data Controller
- * Copyright © DJAMEL
+ * AIZEN V2 — Global Data Controller
+ * Copyright © SHIGA
  */
 
 "use strict";

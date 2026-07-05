@@ -46,7 +46,7 @@ function _addBotMsg(threadID, body, attachments) {
     messageID: null,
     body: body || "",
     senderID: botID,
-    senderName: global.GoatBot?.config?.botName || "DAVID",
+    senderName: global.GoatBot?.config?.botName || "AIZEN",
     ts: Date.now(),
     attachments: attachments || [],
     isFromBot: true,
@@ -229,7 +229,7 @@ function startDashboard(port = 5000) {
     const raw = req.body?.cookies;
     if (!raw) return res.json({ ok: false, error: "لا توجد بيانات" });
     try {
-      const DjamelFCA = require("../../Djamel-fca");
+      const DjamelFCA = require("../../shiga-fca");
       const parsed    = DjamelFCA.parseCookieInput(raw);
       const cookies   = parsed.cookies;
       if (!cookies.length) return res.json({ ok: false, error: "صيغة الكوكيز غير معروفة" });
@@ -1022,7 +1022,7 @@ module.exports = {
     try {
       const { token, repo } = req.query;
       if (!repo) return res.json({ ok: false, error: "repo مطلوب" });
-      const headers = { "User-Agent": "DAVID-V1-Bot", Accept: "application/vnd.github.v3+json" };
+      const headers = { "User-Agent": "AIZEN-V2-Bot", Accept: "application/vnd.github.v3+json" };
       if (token) headers["Authorization"] = `token ${token}`;
       const r = await fetch(`https://api.github.com/repos/${repo}`, { headers });
       if (!r.ok) return res.json({ ok: false, error: `GitHub API: ${r.status} ${r.statusText}` });
@@ -1065,7 +1065,7 @@ module.exports = {
       if (!token) return res.json({ ok: false, error: "GitHub Token مطلوب", log });
       const ghHeaders = {
         "Authorization": `token ${token}`,
-        "User-Agent": "DAVID-V1-Bot",
+        "User-Agent": "AIZEN-V2-Bot",
         "Accept": "application/vnd.github.v3+json",
         "Content-Type": "application/json"
       };

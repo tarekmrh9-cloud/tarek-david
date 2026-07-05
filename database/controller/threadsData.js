@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Threads Data Controller
- * Copyright © DJAMEL
+ * AIZEN V2 — Threads Data Controller
+ * Copyright © SHIGA
  */
 
 "use strict";

@@ -1,11 +1,11 @@
 ---
-name: DAVID V1 Architecture
-description: Key project decisions, structure, and quirks for the DAVID V1 Facebook bot project
+name: AIZEN V2 Architecture
+description: Key project decisions, structure, and quirks for the AIZEN V2 Facebook bot project
 ---
 
 ## Project Overview
 - Node.js 18 / Express / Socket.io on port 5000
-- `Djamel-fca` local package (ESM→CJS patched via postinstall)
+- `shiga-fca` local package (ESM→CJS patched via postinstall)
 - Dashboard: `src/dashboard/public/index.html` (single giant SPA file, ~3200 lines after updates)
 - Android app: `app/src/main/java/com/djamel/davidbot/MainActivity.java` (WebView-based)
 - Login password: `david2025` (in config.json)

@@ -16,7 +16,7 @@ function loadCommands(dir) {
   let loaded = 0, failed = 0;
 
   console.log();
-  console.log(`\x1b[36m  ─── DAVID — تحميل الأوامر (${files.length}) ───\x1b[0m`);
+  console.log(`\x1b[36m  ─── AIZEN — تحميل الأوامر (${files.length}) ───\x1b[0m`);
 
   for (const file of files) {
     const absPath = path.resolve(absDir, file);

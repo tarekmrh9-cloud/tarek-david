@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Database Controller Index
- * Copyright © DJAMEL
+ * AIZEN V2 — Database Controller Index
+ * Copyright © SHIGA
  */
 
 "use strict";

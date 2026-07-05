@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Users Data Controller
- * Copyright © DJAMEL
+ * AIZEN V2 — Users Data Controller
+ * Copyright © SHIGA
  */
 
 "use strict";

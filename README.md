@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/DAVID%20V1-Android%20App-0A84FF?style=for-the-badge&logo=android&logoColor=white" height="36"/>
+<img src="https://img.shields.io/badge/AIZEN%20V2-Android%20App-0A84FF?style=for-the-badge&logo=android&logoColor=white" height="36"/>
 
-# DAVID V1 — DjamelBot Android
+# AIZEN V2 — DjamelBot Android
 
 **لوحة تحكم احترافية لبوت فيسبوك ماسنجر — تطبيق Android بتصميم iOS 26**
 
@@ -10,7 +10,7 @@
 
 ## ⬇️ تحميل التطبيق
 
-[![تحميل APK](https://img.shields.io/github/v/release/castrolmocro/divid-apk?label=%E2%AC%87%EF%B8%8F%20%D8%AA%D8%AD%D9%85%D9%8A%D9%84%20DAVID%20V1%20APK&style=for-the-badge&color=32D74B&logo=android)](https://github.com/castrolmocro/divid-apk/releases/latest/download/david-v1.apk)
+[![تحميل APK](https://img.shields.io/github/v/release/castrolmocro/divid-apk?label=%E2%AC%87%EF%B8%8F%20%D8%AA%D8%AD%D9%85%D9%8A%D9%84%20AIZEN%20V2%20APK&style=for-the-badge&color=32D74B&logo=android)](https://github.com/castrolmocro/divid-apk/releases/latest/download/david-v1.apk)
 
 > انقر الزر الأخضر أعلاه لتحميل أحدث نسخة مباشرةً
 
@@ -69,8 +69,8 @@
 pkg update && pkg install nodejs git -y
 
 # مجلد البوت
-mkdir -p /sdcard/DAVID-V1
-cd /sdcard/DAVID-V1
+mkdir -p /sdcard/AIZEN-V2
+cd /sdcard/AIZEN-V2
 node index.js
 ```
 

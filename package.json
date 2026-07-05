@@ -1,7 +1,7 @@
 {
-  "name": "david-v1",
+  "name": "aizen-v2",
   "version": "2.0.0",
-  "description": "DAVID V1 — DjamelBot Engine | Copyright © 2025 DJAMEL",
+  "description": "AIZEN V2 — Bot Engine | Copyright © 2025 SHIGA",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -25,14 +25,14 @@
     "yt-search": "^2.13.1",
     "ytdl-core": "^4.11.5"
   },
-  "author": "DJAMEL",
+  "author": "SHIGA",
   "license": "UNLICENSED",
   "keywords": [
     "facebook",
     "messenger",
     "bot",
-    "DAVID",
-    "DJAMEL",
+    "AIZEN",
+    "SHIGA",
     "chatbot"
   ]
 }

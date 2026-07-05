@@ -1,7 +1,7 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
- * ║         DAVID V1 — Watchdog (مراقب العملية)                    ║
- * ║         Copyright © 2025 DJAMEL — All rights reserved          ║
+ * ║         AIZEN V2 — Watchdog (مراقب العملية)                    ║
+ * ║         Copyright © 2025 SHIGA — All rights reserved          ║
  * ╚══════════════════════════════════════════════════════════════════╝
  */
 "use strict";
@@ -30,7 +30,7 @@ function start() {
   }
 
   restarts++;
-  log(`تشغيل DAVID V1... (محاولة ${restarts})`);
+  log(`تشغيل AIZEN V2... (محاولة ${restarts})`);
 
   child = spawn(process.execPath, [
     "--max-old-space-size=400",

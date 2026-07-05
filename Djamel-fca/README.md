@@ -1,10 +1,10 @@
-# Djamel-fca
+# shiga-fca
 
-> مكاتب البوت — Facebook Client Abstractions for DAVID V1
+> مكاتب البوت — Facebook Client Abstractions for AIZEN V2
 
-**Copyright © DJAMEL — All rights reserved.**
+**Copyright © SHIGA — All rights reserved.**
 
-A high-level abstraction library over `fca-eryxenx` (Facebook Client API) built for the **DAVID V1** Messenger Bot.
+A high-level abstraction library over `fca-eryxenx` (Facebook Client API) built for the **AIZEN V2** Messenger Bot.
 
 ---
 
@@ -28,7 +28,7 @@ A high-level abstraction library over `fca-eryxenx` (Facebook Client API) built 
 ## Usage
 
 ```js
-const fca = require("./Djamel-fca");
+const fca = require("./shiga-fca");
 
 // Send with human typing simulation
 await fca.humanSend(api, "Hello!", threadID);
@@ -46,9 +46,9 @@ await queue.enqueue(() => api.sendMessage("msg 2", tid));
 
 ## About
 
-This library is part of the **DAVID V1** bot project by **DJAMEL**.
+This library is part of the **AIZEN V2** bot project by **SHIGA**.
 
-- Author: **DJAMEL**
+- Author: **SHIGA**
 - Version: 1.0.0
 - Engine: White Bot Engine
 - Platform: Facebook Messenger

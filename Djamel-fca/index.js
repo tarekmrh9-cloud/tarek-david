@@ -1,8 +1,8 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════════╗
- * ║       DJAMEL-FCA v3.0 — Facebook Client Abstractions               ║
- * ║       Copyright © 2025 DJAMEL — All rights reserved               ║
- * ║       Built exclusively for DAVID V1 Bot Engine                    ║
+ * ║       SHIGA-FCA v3.0 — Facebook Client Abstractions               ║
+ * ║       Copyright © 2025 SHIGA — All rights reserved               ║
+ * ║       Built exclusively for AIZEN V2 Bot Engine                    ║
  * ╚══════════════════════════════════════════════════════════════════════╝
  *
  * Features:
@@ -209,9 +209,9 @@ function login(cookieInput, opts, callback) {
   }
 
   if (!appState.length)
-    return callback(new Error("[Djamel-fca] لا توجد كوكيز صالحة"), null);
+    return callback(new Error("[shiga-fca] لا توجد كوكيز صالحة"), null);
   if (!hasMandatory(appState))
-    return callback(new Error("[Djamel-fca] الكوكيز ناقصة: c_user أو xs مفقود"), null);
+    return callback(new Error("[shiga-fca] الكوكيز ناقصة: c_user أو xs مفقود"), null);
 
   const loginOpts = {
     appState, forceLogin: false, logLevel: "silent",
@@ -263,4 +263,4 @@ module.exports.simulateTyping     = simulateTyping;
 module.exports.buildReplyHelper   = buildReplyHelper;
 module.exports.getThreadInfo      = getThreadInfo;
 module.exports.version            = "3.0.0";
-module.exports.author             = "DJAMEL";
+module.exports.author             = "SHIGA";

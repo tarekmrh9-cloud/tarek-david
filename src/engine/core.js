@@ -31,7 +31,7 @@ function initGlobals(config) {
   global.db = { allThreadData: [], allUserData: [] };
 
   // utils globaux
-  const fca = require("../../Djamel-fca");
+  const fca = require("../../shiga-fca");
   global.utils = {
     calcHumanTypingDelay: fca.calcTypingDelay,
     simulateTyping:       fca.simulateTyping,
