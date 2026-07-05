@@ -1432,10 +1432,89 @@ input:checked+.slider::before{transform:translateX(21px);}
     </div><!-- /messenger-wrap -->
   </div><!-- /tab-messenger -->
 
-  <!-- ─── Cookies ────────────────────────────────────── -->
+  <!-- ═══════════════════════════════════════════════════════
+       🍪  Cookies System — AIZEN V2
+  ════════════════════════════════════════════════════════ -->
   <div class="tab-pane" id="tab-cookies">
+
+    <!-- ① بطاقة الحالة اللحظية -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title" style="display:flex;align-items:center;gap:8px">
+        🍪 نظام الكوكيز
+        <span id="ck-status-badge" style="
+          font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;
+          background:rgba(255,255,255,.1);color:var(--t2);
+        ">⏳ يتحقق…</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
+          <div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">آخر تجديد</div>
+          <div id="ck-last-refresh" style="font-size:13px;font-weight:600">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
+          <div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">التجديد التالي</div>
+          <div id="ck-next-refresh" style="font-size:13px;font-weight:600">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
+          <div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">عدد الكوكيز</div>
+          <div id="ck-count" style="font-size:13px;font-weight:600">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
+          <div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">UID الحساب</div>
+          <div id="ck-uid" style="font-size:13px;font-weight:600;word-break:break-all">—</div>
+        </div>
+      </div>
+
+      <div class="btn-row" style="flex-wrap:wrap;gap:8px">
+        <button class="btn btn-primary" id="btn-ck-refresh" onclick="manualCookieRefresh()">🔄 تجديد الكوكيز الآن</button>
+        <button class="btn btn-ghost"   onclick="fetchCurrentCookies()">👁 عرض الكوكيز</button>
+        <button class="btn btn-ghost"   onclick="fetchCookieLogs()">📋 سجل العمليات</button>
+      </div>
+      <div style="font-size:11px;color:var(--t2);margin-top:8px">
+        🕐 تجديد تلقائي كل 3–4 ساعات | ✅ Non-blocking | 💾 يحفظ في account.txt + cookies.json
+      </div>
+    </div>
+
+    <!-- ② عرض الكوكيز الحالية (مخفية جزئياً) -->
+    <div class="card" id="ck-current-card" style="margin-bottom:14px;display:none">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>🔑 الكوكيز الحالية</span>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ck-current-card').style.display='none'">✕</button>
+      </div>
+      <div style="font-size:11px;color:var(--t2);margin-bottom:10px">
+        🔒 القيم الحساسة مخفية جزئياً لأسباب أمنية
+      </div>
+      <div id="ck-table-wrap" style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px" id="ck-table">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.1)">
+              <th style="text-align:right;padding:6px 8px;color:var(--t2);font-weight:600">المفتاح</th>
+              <th style="text-align:right;padding:6px 8px;color:var(--t2);font-weight:600">القيمة</th>
+              <th style="text-align:center;padding:6px 8px;color:var(--t2);font-weight:600">حساس</th>
+            </tr>
+          </thead>
+          <tbody id="ck-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ③ سجل عمليات الكوكيز -->
+    <div class="card" id="ck-logs-card" style="margin-bottom:14px;display:none">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>📋 سجل عمليات الكوكيز</span>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ck-logs-card').style.display='none'">✕</button>
+      </div>
+      <div id="ck-log-box" style="
+        font-family:monospace;font-size:11px;line-height:1.7;
+        background:rgba(0,0,0,.3);border-radius:8px;padding:10px;
+        max-height:280px;overflow-y:auto;direction:rtl;
+      "></div>
+    </div>
+
+    <!-- ④ رفع كوكيز جديدة -->
     <div class="card">
-      <div class="card-title">🍪 رفع الكوكيز</div>
+      <div class="card-title">📤 رفع كوكيز جديدة</div>
       <div class="fg">
         <label>الكوكيز — JSON / c3c / Netscape / Header String</label>
         <textarea id="cookieInput" rows="7" placeholder='[{"key":"c_user","value":"..."},{"key":"xs","value":"..."}]&#10;أو: c_user=123; xs=abc'></textarea>
@@ -1446,6 +1525,7 @@ input:checked+.slider::before{transform:translateX(21px);}
         <button class="btn btn-ghost" onclick="document.getElementById('cookieInput').value=''">🗑 مسح</button>
       </div>
     </div>
+
   </div>
 
   <!-- ─── Commands ──────────────────────────────────── -->
@@ -2062,6 +2142,8 @@ function initSocket() {
   _socket.on("config-reloaded",  () => toast("🔄 الإعدادات تحدثت", "success"));
   _socket.on("pong-bot",         d => toast(`🏓 ${Date.now() - d.ts}ms`, "success"));
   _socket.on("messenger-msg",    d => onMessengerMsg(d));
+  _socket.on("cookie-status",   d => onCookieStatus(d));
+  _socket.on("cookie-log",      d => onCookieLogLive(d));
 }
 
 /* ─── Status ─────────────────────────────────────── */
@@ -2185,9 +2267,143 @@ async function uploadCookies() {
   btn.disabled = true; btn.textContent = "⏳ جاري…";
   const r = await apiFetch("/api/cookies", { method:"POST", body:JSON.stringify({ cookies:raw }) });
   btn.disabled = false; btn.textContent = "📤 رفع وتسجيل الدخول";
-  if (r.ok) { toast(`✅ تم رفع ${r.count} كوكي — جاري الدخول…`, "success"); setStatus("connecting","يتصل…"); }
-  else toast("❌ " + (r.error || "فشل"), "error");
+  if (r.ok) {
+    toast(`✅ تم رفع ${r.count} كوكي — جاري الدخول…`, "success");
+    setStatus("connecting","يتصل…");
+    setTimeout(fetchCookieStatus, 4000);
+  } else toast("❌ " + (r.error || "فشل"), "error");
 }
+
+/* ══════════════════════════════════════════════════════
+   🍪  Cookie Manager Functions
+══════════════════════════════════════════════════════ */
+
+const _CK_STATUS_LABELS = {
+  unknown:    { text:"⏳ غير معروف", bg:"rgba(255,255,255,.1)",   color:"#aaa" },
+  valid:      { text:"✅ صالح",       bg:"rgba(50,215,75,.18)",    color:"#32D74B" },
+  refreshing: { text:"🔄 يتجدد…",    bg:"rgba(10,132,255,.18)",   color:"#0A84FF" },
+  expired:    { text:"❌ منتهي",      bg:"rgba(255,69,58,.18)",    color:"#FF453A" },
+  error:      { text:"⚠️ خطأ",       bg:"rgba(255,214,10,.18)",   color:"#FFD60A" },
+};
+
+function _ckFmtTime(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d)) return "—";
+  const now  = Date.now();
+  const diff = Math.abs(now - d.getTime());
+  if (diff < 60000) return "الآن";
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins} دقيقة`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} ساعة`;
+  return d.toLocaleDateString("ar");
+}
+
+function onCookieStatus(d) {
+  if (!d) return;
+  const badge = document.getElementById("ck-status-badge");
+  const lbl   = _CK_STATUS_LABELS[d.status] || _CK_STATUS_LABELS.unknown;
+  if (badge) {
+    badge.textContent   = lbl.text;
+    badge.style.background = lbl.bg;
+    badge.style.color      = lbl.color;
+  }
+  setText("ck-last-refresh", d.lastRefresh ? `${_ckFmtTime(d.lastRefresh)} مضت` : "—");
+  setText("ck-next-refresh", d.nextRefresh ? `بعد ${_ckFmtTime(d.nextRefresh)}` : "—");
+  setText("ck-count",        d.cookieCount ? `${d.cookieCount} كوكي` : "—");
+  setText("ck-uid",          d.uid || "—");
+}
+
+function onCookieLogLive(entry) {
+  const box = document.getElementById("ck-log-box");
+  if (!box) return;
+  const logsCard = document.getElementById("ck-logs-card");
+  if (logsCard && logsCard.style.display === "none") return; // لا تضف لو مخفي
+  const div = document.createElement("div");
+  const ts  = new Date(entry.ts).toTimeString().slice(0,8);
+  const col = entry.level === "ok" ? "#32D74B" : entry.level === "error" ? "#FF453A" : entry.level === "warn" ? "#FFD60A" : "#aaa";
+  div.style.cssText = `color:${col};margin-bottom:2px`;
+  div.textContent   = `[${ts}] ${entry.msg}`;
+  box.insertBefore(div, box.firstChild);
+  if (box.children.length > 150) box.removeChild(box.lastChild);
+}
+
+async function fetchCookieStatus() {
+  const r = await apiFetch("/api/cookies/status");
+  if (r.ok) onCookieStatus(r);
+}
+
+async function fetchCurrentCookies() {
+  const card = document.getElementById("ck-current-card");
+  const tbody = document.getElementById("ck-tbody");
+  if (!card || !tbody) return;
+  card.style.display = "block";
+  tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:12px;color:var(--t2)">⏳ جاري التحميل…</td></tr>';
+
+  const r = await apiFetch("/api/cookies/current");
+  if (!r.ok || !r.cookies?.length) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:12px;color:#FF453A">❌ لا توجد كوكيز أو حدث خطأ</td></tr>';
+    return;
+  }
+  tbody.innerHTML = r.cookies.map(c => `
+    <tr style="border-bottom:1px solid rgba(255,255,255,.05)">
+      <td style="padding:7px 8px;font-weight:600;color:${c.sensitive?"#FFD60A":"var(--text)"}">${esc(c.key)}</td>
+      <td style="padding:7px 8px;color:var(--t2);font-family:monospace;font-size:11px;word-break:break-all">${esc(c.value)}</td>
+      <td style="text-align:center;padding:7px 8px">${c.sensitive ? "🔒" : "—"}</td>
+    </tr>`).join("");
+}
+
+async function fetchCookieLogs() {
+  const card = document.getElementById("ck-logs-card");
+  const box  = document.getElementById("ck-log-box");
+  if (!card || !box) return;
+  card.style.display = "block";
+  box.innerHTML = '<div style="color:var(--t2);text-align:center;padding:10px">⏳ جاري التحميل…</div>';
+
+  const r = await apiFetch("/api/cookies/logs");
+  if (!r.ok || !r.logs?.length) {
+    box.innerHTML = '<div style="color:var(--t2);text-align:center;padding:10px">لا توجد سجلات بعد</div>';
+    return;
+  }
+  box.innerHTML = r.logs.map(entry => {
+    const ts  = new Date(entry.ts).toTimeString().slice(0,8);
+    const col = entry.level === "ok" ? "#32D74B" : entry.level === "error" ? "#FF453A" : entry.level === "warn" ? "#FFD60A" : "#aaa";
+    return `<div style="color:${col};margin-bottom:3px">[${ts}] ${esc(entry.msg)}</div>`;
+  }).join("");
+}
+
+async function manualCookieRefresh() {
+  const btn = document.getElementById("btn-ck-refresh");
+  if (btn) { btn.disabled = true; btn.textContent = "⏳ جاري التجديد…"; }
+
+  const badge = document.getElementById("ck-status-badge");
+  if (badge) {
+    badge.textContent      = "🔄 يتجدد…";
+    badge.style.background = "rgba(10,132,255,.18)";
+    badge.style.color      = "#0A84FF";
+  }
+
+  const r = await apiFetch("/api/cookies/refresh", { method:"POST" });
+
+  if (btn) { btn.disabled = false; btn.textContent = "🔄 تجديد الكوكيز الآن"; }
+
+  if (r.ok) {
+    toast(`✅ تم تجديد ${r.count || "?"} كوكي بنجاح`, "success");
+    await fetchCookieStatus();
+  } else {
+    toast("❌ " + (r.reason || r.error || "فشل التجديد"), "error");
+    await fetchCookieStatus();
+  }
+}
+
+// تحميل حالة الكوكيز عند فتح التاب
+document.addEventListener("DOMContentLoaded", () => {
+  // استمع لفتح تاب الكوكيز
+  document.querySelectorAll("[data-tab='cookies']").forEach(el => {
+    el.addEventListener("click", fetchCookieStatus);
+  });
+});
 async function controlBot(action) {
   if (action === "stop" && !confirm("⚠️ هل أنت متأكد؟")) return;
   const btn = document.getElementById(action === "restart" ? "btn-restart" : "btn-stop");

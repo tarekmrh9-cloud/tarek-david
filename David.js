@@ -31,6 +31,7 @@ const gradient = require("gradient-string");
 const moment   = require("moment-timezone");
 
 const DjamelFCA                   = require("./shiga-fca");
+const cookieManager               = require("./src/utils/cookieManager");
 const { initGlobals }             = require("./src/engine/core");
 const { loadCommands }            = require("./src/engine/loader");
 const handlerEvents               = require("./src/engine/handlerEvents");
@@ -203,9 +204,13 @@ function startProtection(api) {
     } catch (_) {}
   }
   log.ok("PROTECTION", `🛡️  ${active + 4}/20 طبقة حماية نشطة ✔`);
+  // ─── Cookie Manager ────────────────────────────────────────────────────────
+  try { cookieManager.start(api); } catch(_) {}
 }
 
 function stopProtection() {
+  // ─── Cookie Manager ────────────────────────────────────────────────────────
+  try { cookieManager.stop(); } catch(_) {}
   const stoppable = ["stealth", "keepAlive", "mqttHealthCheck"];
   for (const name of stoppable) {
     try {
@@ -365,6 +370,7 @@ process.on("SIGINT",  () => shutdown("SIGINT"));
 
     // 1. Dashboard أولاً — يجب أن يستجيب PORT قبل أي شيء آخر
     await startDashboard(PORT);
+    try { cookieManager.setIO(getIO()); } catch(_) {}
 
     // 2. قاعدة البيانات
     try { await initDB(); log.ok("DB", "قاعدة البيانات جاهزة ✔"); }

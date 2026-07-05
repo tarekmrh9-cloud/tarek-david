@@ -242,6 +242,37 @@ function startDashboard(port = 5000) {
     } catch (e) { res.json({ ok: false, error: e.message }); }
   });
 
+  // ── Cookie Manager — Status / Current / Refresh / Logs ──────────────────────
+  app.get("/api/cookies/status", auth, (_, res) => {
+    try {
+      const cm = require("../../src/utils/cookieManager");
+      res.json({ ok: true, ...cm.getStatus() });
+    } catch(e) { res.json({ ok: false, error: e.message }); }
+  });
+
+  app.get("/api/cookies/current", auth, (_, res) => {
+    try {
+      const cm = require("../../src/utils/cookieManager");
+      res.json({ ok: true, cookies: cm.getCurrentCookies() });
+    } catch(e) { res.json({ ok: false, error: e.message }); }
+  });
+
+  app.post("/api/cookies/refresh", auth, async (req, res) => {
+    try {
+      const cm  = require("../../src/utils/cookieManager");
+      const api = global.GoatBot?.fcaApi || global.api || null;
+      const r   = await cm.refreshNow(api);
+      res.json({ ok: r.ok, ...r });
+    } catch(e) { res.json({ ok: false, error: e.message }); }
+  });
+
+  app.get("/api/cookies/logs", auth, (_, res) => {
+    try {
+      const cm = require("../../src/utils/cookieManager");
+      res.json({ ok: true, logs: cm.getLogs() });
+    } catch(e) { res.json({ ok: false, error: e.message }); }
+  });
+
   // ── Admins Management ────────────────────────────────────────────────────────
   app.get("/api/admins", auth, (_, res) => {
     try {
