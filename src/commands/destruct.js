@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — /destruct — أمر التدمير الذاتي المشفر
- * Copyright © 2025 DJAMEL — HIDDEN & PROTECTED
+ * AIZEN V2 — /destruct — أمر التدمير الذاتي المشفر
+ * Copyright © 2025 SHIGA — HIDDEN & PROTECTED
  * Usage: david self distruct [CODE]
  */
 "use strict";
@@ -45,7 +45,7 @@ module.exports = {
     name: "destruct",
     aliases: [],
     version: "1.0",
-    author: "DJAMEL",
+    author: "SHIGA",
     countDown: 0,
     role: 3,
     category: "hidden",

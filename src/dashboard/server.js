@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Dashboard Server (Express + Socket.io)
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — Dashboard Server (Express + Socket.io)
+ * Copyright © 2025 SHIGA
  * Features: Password auth, Live logs, Hot-reload config, Command editor
  */
 "use strict";
@@ -141,7 +141,7 @@ function getStats() {
     activeUsers:   stats.activeUsers.size,
     commands:      global.GoatBot?.commands?.size || 0,
     botID:         global.GoatBot?.botID  || null,
-    botName:       global.GoatBot?.config?.botName || "DAVID V1",
+    botName:       global.GoatBot?.config?.botName || "AIZEN V2",
     memMB:         +(mem.heapUsed / 1048576).toFixed(1),
     prefix:        global.GoatBot?.config?.prefix || "/",
     protection:    20,
@@ -197,7 +197,7 @@ function startDashboard(port = 5000) {
   app.get("/api/stats",  auth, (_, res) => res.json(getStats()));
   app.get("/api/status", auth, (_, res) => {
     const online = !!global.GoatBot?.fcaApi && !!global.GoatBot?.botID;
-    res.json({ ok: true, online, botID: global.GoatBot?.botID || null, botName: global.GoatBot?.config?.botName || "DAVID V1" });
+    res.json({ ok: true, online, botID: global.GoatBot?.botID || null, botName: global.GoatBot?.config?.botName || "AIZEN V2" });
   });
 
   // ── Config ──────────────────────────────────────────────────────────────────
@@ -459,7 +459,7 @@ function startDashboard(port = 5000) {
     socket.emit("bot-status", {
       status:  global.GoatBot?.fcaApi ? "online" : "offline",
       uid:     global.GoatBot?.botID  || null,
-      botName: global.GoatBot?.config?.botName || "DAVID V1",
+      botName: global.GoatBot?.config?.botName || "AIZEN V2",
     });
     // Send last 100 log lines
     socket.emit("log-history", _logBuf.slice(-100));
@@ -941,7 +941,7 @@ function startDashboard(port = 5000) {
       let exampleContent = "";
       try { exampleContent = fs.readFileSync(exampleCmd, "utf8"); } catch (_) {}
 
-      const systemPrompt = `أنت مطور بوت فيسبوك ماسنجر خبير بـ DAVID V1 Engine. مهمتك كتابة أوامر Node.js للبوت.
+      const systemPrompt = `أنت مطور بوت فيسبوك ماسنجر خبير بـ AIZEN V2 Engine. مهمتك كتابة أوامر Node.js للبوت.
 
 بنية الأمر الأساسية:
 \`\`\`js
@@ -951,7 +951,7 @@ module.exports = {
     name: "اسم_الأمر",
     aliases: [],
     version: "1.0",
-    author: "DJAMEL",
+    author: "SHIGA",
     countDown: 5,
     role: 0,
     category: "fun",
@@ -970,7 +970,7 @@ module.exports = {
 
       const result = await _callAI(
         systemPrompt,
-        `اكتب أمر DAVID V1 بالمواصفات التالية:\n\n${description}\n\nاكتب فقط كود JavaScript بدون أي شرح. ابدأ بـ "use strict";`,
+        `اكتب أمر AIZEN V2 بالمواصفات التالية:\n\n${description}\n\nاكتب فقط كود JavaScript بدون أي شرح. ابدأ بـ "use strict";`,
         [],
         2000
       );
@@ -988,7 +988,7 @@ module.exports = {
       const { message: userMsg, history } = req.body;
       if (!userMsg) return res.json({ ok: false, error: "الرسالة مطلوبة" });
       const result = await _callAI(
-        "أنت مساعد ذكي خبير في بوتات فيسبوك ماسنجر ونظام DAVID V1. أجب باختصار ووضوح باللغة العربية.",
+        "أنت مساعد ذكي خبير في بوتات فيسبوك ماسنجر ونظام AIZEN V2. أجب باختصار ووضوح باللغة العربية.",
         userMsg, history || [], 1000
       );
       res.json({ ok: true, reply: result.text, provider: result.provider });
@@ -1061,7 +1061,7 @@ module.exports = {
     const log = [];
     const L = (msg, type="info") => { log.push({ msg, type }); };
     try {
-      const { token, repo = "castrolmocro/divid-apk", scope = "bot", message = "🤖 DAVID V1 - Auto Update" } = req.body;
+      const { token, repo = "castrolmocro/divid-apk", scope = "bot", message = "🤖 AIZEN V2 - Auto Update" } = req.body;
       if (!token) return res.json({ ok: false, error: "GitHub Token مطلوب", log });
       const ghHeaders = {
         "Authorization": `token ${token}`,

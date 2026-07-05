@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — /angel v5 — رسائل تلقائية مع نظام مراقبة ذكي
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — /angel v5 — رسائل تلقائية مع نظام مراقبة ذكي
+ * Copyright © 2025 SHIGA
  * ✦ يتوقف مؤقتاً إذا كان البوت آخر 3 مرات بدون رد بشري
  * ✦ يستأنف عند أول رسالة بشرية
  * ✦ يغادر المجموعة بعد 16 دقيقة من الصمت
@@ -107,7 +107,7 @@ function restoreAll(api) {
 // ── Module ────────────────────────────────────────────────────────────────────
 module.exports = {
   config: {
-    name: "angel", aliases: ["ang"], version: "5.0", author: "DJAMEL",
+    name: "angel", aliases: ["ang"], version: "5.0", author: "SHIGA",
     countDown: 3, role: 2, category: "management",
     description: "رسائل تلقائية ذكية مع نظام مراقبة",
     guide: { en: "{pn} [رسالة] [min] [max] — تفعيل\n{pn} off — إيقاف\n{pn} status — الحالة" }

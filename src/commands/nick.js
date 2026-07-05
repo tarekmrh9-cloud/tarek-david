@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — /nick v6 — قفل الكنيات (Continuous Lock Mode)
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — /nick v6 — قفل الكنيات (Continuous Lock Mode)
+ * Copyright © 2025 SHIGA
  * ✦ يقفل كنية كل عضو ويغيّرها كل 3.5–4 ثوانٍ بشكل مستمر
  * ✦ يراقب عبر onEvent ويعيد الكنية فوراً عند أي تغيير
  * ✦ /nick off يوقف الحلقة فوراً
@@ -89,7 +89,7 @@ async function applyAllLoop(api, tid) {
 // ── Module ────────────────────────────────────────────────────────────────────
 module.exports = {
   config: {
-    name: "nick", aliases: ["كنيات", "nickname"], version: "6.0", author: "DJAMEL",
+    name: "nick", aliases: ["كنيات", "nickname"], version: "6.0", author: "SHIGA",
     countDown: 3, role: 2, category: "management",
     description: "قفل كنيات الأعضاء ومنع تغييرها — حلقة مستمرة كل 3.5–4 ثوانٍ",
     guide: {
@@ -162,7 +162,7 @@ module.exports = {
     // ── [name] — قفل عام مستمر ────────────────────────────────────────────────
     const name = args.join(" ").trim();
     if (!name) return message.reply(
-      "❌ اكتب الاسم.\nمثال: /nick DJAMEL\n\nالأوامر:\n" +
+      "❌ اكتب الاسم.\nمثال: /nick SHIGA\n\nالأوامر:\n" +
       "/nick [اسم] — قفل للكل\n" +
       "/nick set [uid] [اسم] — قفل لشخص\n" +
       "/nick off — إيقاف\n" +

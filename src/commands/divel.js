@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — /divel — رسائل دورية للغروب مع انتظار عشوائي
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — /divel — رسائل دورية للغروب مع انتظار عشوائي
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 const fs   = require("fs-extra");
@@ -43,7 +43,7 @@ function restoreAll(api) {
 
 module.exports = {
   config: {
-    name: "divel", aliases: ["dv"], version: "2.0", author: "DJAMEL",
+    name: "divel", aliases: ["dv"], version: "2.0", author: "SHIGA",
     countDown: 3, role: 2, category: "management",
     description: "رسائل دورية للغروب مع انتظار عشوائي",
     guide: { en: "{pn} [رسالة] [min-max ثانية]\n{pn} off\n{pn} status" }

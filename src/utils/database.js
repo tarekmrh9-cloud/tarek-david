@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Database Init
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — Database Init
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 const fs   = require("fs-extra");

@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — /chats — إدارة المحادثات والغروبات
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — /chats — إدارة المحادثات والغروبات
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 const fs   = require("fs-extra");
@@ -20,7 +20,7 @@ function setDmLocked(v) {
 
 module.exports = {
   config: {
-    name: "chats", aliases: ["محادثات","chat"], version: "2.0", author: "DJAMEL",
+    name: "chats", aliases: ["محادثات","chat"], version: "2.0", author: "SHIGA",
     countDown: 3, role: 2, category: "management",
     description: "إدارة المحادثات والغروبات",
     guide: { en: "{pn} list — قائمة الغروبات\n{pn} dm on/off — قفل/فك DM\n{pn} angel — حالة Angel\n{pn} count" }

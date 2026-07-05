@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — /setavatar — تغيير صورة حساب البوت
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — /setavatar — تغيير صورة حساب البوت
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 const axios = require("axios");
@@ -17,7 +17,7 @@ function isBotAdmin(id) {
 
 module.exports = {
   config: {
-    name: "setavatar", aliases: ["avatar","صورة-البوت"], version: "1.0", author: "DJAMEL",
+    name: "setavatar", aliases: ["avatar","صورة-البوت"], version: "1.0", author: "SHIGA",
     countDown: 10, role: 3, category: "management",
     description: "تغيير صورة البروفايل لحساب البوت",
     guide: { en: "{pn} [رابط] — أو رد على صورة بـ {pn}" }

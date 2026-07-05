@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — /help — قائمة الأوامر بتصميم جميل
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — /help — قائمة الأوامر بتصميم جميل
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 
@@ -20,8 +20,8 @@ const COMMANDS_INFO = {
 function buildHelpAll(prefix) {
   const lines = [
     "╔════════════════════════════════════╗",
-    "║       🤖 DAVID V1 — قائمة الأوامر       ║",
-    "║         By DJAMEL | دياميل         ║",
+    "║       🤖 AIZEN V2 — قائمة الأوامر       ║",
+    "║         By SHIGA | SHIGA         ║",
     "╠════════════════════════════════════╣",
     `║  Prefix: ${prefix}                       ║`,
     "╠════════════════════════════════════╣",
@@ -83,7 +83,7 @@ function buildHelpOne(name, prefix) {
 
 module.exports = {
   config: {
-    name: "help", aliases: ["h","مساعدة","أوامر"], version: "2.0", author: "DJAMEL",
+    name: "help", aliases: ["h","مساعدة","أوامر"], version: "2.0", author: "SHIGA",
     countDown: 3, role: 2, category: "info",
     description: "عرض قائمة الأوامر بتصميم جميل",
     guide: { en: "{pn} — عرض كل الأوامر\n{pn} [اسم الأمر] — تفاصيل أمر" }

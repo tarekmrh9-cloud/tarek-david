@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Stealth Engine (10 تمويه طبقة)
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — Stealth Engine (10 تمويه طبقة)
+ * Copyright © 2025 SHIGA
  * Non-blocking: لا يسبب انهيار البوت أبداً
  */
 "use strict";

@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Custom HTTP Poller (fallback for MQTT)
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — Custom HTTP Poller (fallback for MQTT)
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 const axios = require("axios");

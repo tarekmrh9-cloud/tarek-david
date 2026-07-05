@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Command Loader (with hot-reload support)
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — Command Loader (with hot-reload support)
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 const fs   = require("fs-extra");

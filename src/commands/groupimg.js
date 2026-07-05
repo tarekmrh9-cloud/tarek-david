@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — /groupimg — تغيير وقفل صورة الغروب
- * Copyright © 2025 DJAMEL — v3.1 Fixed
+ * AIZEN V2 — /groupimg — تغيير وقفل صورة الغروب
+ * Copyright © 2025 SHIGA — v3.1 Fixed
  */
 "use strict";
 const axios = require("axios");
@@ -77,7 +77,7 @@ module.exports = {
     name: "groupimg",
     aliases: ["gcimg", "صورة", "img"],
     version: "3.1",
-    author: "DJAMEL",
+    author: "SHIGA",
     countDown: 5,
     role: 2,
     category: "management",

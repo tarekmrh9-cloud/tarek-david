@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — MQTT Health Check (Layer 6)
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — MQTT Health Check (Layer 6)
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 let _t = null, _count = 0;
@@ -25,7 +25,7 @@ async function doCheck() {
     try {
       const api  = global.GoatBot?.fcaApi;
       const ids  = [...(global.GoatBot?.config?.adminBot||[]),...(global.GoatBot?.config?.superAdminBot||[])];
-      if (api) for (const id of ids) { try { api.sendMessage(`⚠️ [DAVID V1] إعادة الاتصال التلقائية (#${_count})`, String(id)).catch(()=>{}); } catch(_){} }
+      if (api) for (const id of ids) { try { api.sendMessage(`⚠️ [AIZEN V2] إعادة الاتصال التلقائية (#${_count})`, String(id)).catch(()=>{}); } catch(_){} }
     } catch (_) {}
   }
   try { await global.GoatBot?.reLoginBot?.(); } catch (_) {}

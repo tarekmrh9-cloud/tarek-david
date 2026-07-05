@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Unified Event Handler (WHITE-V3 + Jarfis merged)
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — Unified Event Handler (WHITE-V3 + Jarfis merged)
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 

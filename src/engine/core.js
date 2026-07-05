@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Core Globals (GoatBot Pattern)
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — Core Globals (GoatBot Pattern)
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 

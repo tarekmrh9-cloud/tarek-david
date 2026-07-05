@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Logger
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — Logger
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 const chalk  = require("chalk");

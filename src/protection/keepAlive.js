@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Keep Alive (Layer 5)
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — Keep Alive (Layer 5)
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 const axios = require("axios");

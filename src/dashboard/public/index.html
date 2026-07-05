@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<title>DAVID V1</title>
+<title>AIZEN V2</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="DAVID V1">
+<meta name="apple-mobile-web-app-title" content="AIZEN V2">
 <script src="/socket.io/socket.io.js"></script>
 <style>
 :root{
@@ -1144,7 +1144,7 @@ input:checked+.slider::before{transform:translateX(21px);}
     <div class="angel-av">
       <img src="/angel.png" class="angel-logo" alt="DAVID" onerror="this.parentElement.innerHTML='<span style=font-size:32px;font-weight:900>D</span>'">
     </div>
-    <h2>DAVID V1</h2>
+    <h2>AIZEN V2</h2>
     <p>أدخل كلمة السر للوصول للوحة التحكم</p>
     <input id="pwd-input" type="password" placeholder="كلمة السر" autocomplete="current-password">
     <button class="lc-btn" onclick="doLogin()">الدخول</button>
@@ -1159,7 +1159,7 @@ input:checked+.slider::before{transform:translateX(21px);}
       <img src="/angel.png" class="angel-logo" alt="D" onerror="this.parentElement.style.background='linear-gradient(135deg,#0A84FF,#BF5AF2)';this.parentElement.innerHTML='<span style=font-size:17px;font-weight:900>D</span>'">
     </div>
     <div>
-      <div class="hdr-title">DAVID V1</div>
+      <div class="hdr-title">AIZEN V2</div>
       <div class="hdr-sub">DjamelBot Engine v2.0</div>
     </div>
   </div>
@@ -1238,7 +1238,7 @@ input:checked+.slider::before{transform:translateX(21px);}
         <img src="/angel.png" class="angel-logo" alt="D" onerror="this.parentElement.innerHTML='<span style=font-size:24px;font-weight:900>D</span>'">
       </div>
       <div>
-        <div class="bot-name" id="botName">DAVID V1</div>
+        <div class="bot-name" id="botName">AIZEN V2</div>
         <div class="bot-sub" id="botStatus">جاري التحميل…</div>
         <div class="bot-uid" id="botUID"></div>
       </div>
@@ -1555,7 +1555,7 @@ input:checked+.slider::before{transform:translateX(21px);}
     <!-- APK Download Card -->
     <div class="card" style="background:linear-gradient(135deg,rgba(10,132,255,.12),rgba(191,90,242,.12));border:1px solid rgba(10,132,255,.3);position:relative;overflow:hidden;">
       <div style="position:absolute;top:10px;left:14px;background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.5px;">v5.0 جديد</div>
-      <div class="card-title">📱 تطبيق Android — DAVID V1</div>
+      <div class="card-title">📱 تطبيق Android — AIZEN V2</div>
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
         <div style="flex:1;min-width:200px;">
           <p style="font-size:13px;color:var(--t2);margin:0 0 8px 0;">التطبيق الأصلي للتحكم الكامل في البوت من هاتفك</p>
@@ -1597,7 +1597,7 @@ input:checked+.slider::before{transform:translateX(21px);}
       <div class="card-title">⚙️ الإعدادات العامة</div>
       <div class="settings-section">
         <div class="settings-section-title">معلومات البوت</div>
-        <div class="fg"><label>اسم البوت</label><input type="text" id="cfg-botName" value="DAVID V1"></div>
+        <div class="fg"><label>اسم البوت</label><input type="text" id="cfg-botName" value="AIZEN V2"></div>
         <div class="fg"><label>Prefix — بادئة الأوامر</label><input type="text" id="cfg-prefix" value="/" maxlength="3"></div>
         <div class="fg"><label>كلمة سر لوحة التحكم</label><input type="password" id="cfg-dashpwd" placeholder="اتركه فارغاً للإبقاء على الحالي"></div>
       </div>
@@ -1847,7 +1847,7 @@ input:checked+.slider::before{transform:translateX(21px);}
       </div>
       <div class="form-group" style="margin-bottom:12px;">
         <label class="form-label">💬 رسالة الـ Commit</label>
-        <input class="form-input" type="text" id="ghCommitMsg" value="🤖 DAVID V1 - Auto Update" placeholder="رسالة الـ Commit">
+        <input class="form-input" type="text" id="ghCommitMsg" value="🤖 AIZEN V2 - Auto Update" placeholder="رسالة الـ Commit">
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-primary" id="btnPushGithub" onclick="pushToGithub()">
@@ -1973,7 +1973,7 @@ input:checked+.slider::before{transform:translateX(21px);}
 
 <script>
 /* ═══════════════════════════════════════════════════
-   DAVID V1 — Dashboard v2.0 — by DJAMEL
+   AIZEN V2 — Dashboard v2.0 — by SHIGA
    ═══════════════════════════════════════════════════ */
 let _token       = localStorage.getItem("david_token") || "";
 let _socket      = null;
@@ -2070,7 +2070,7 @@ function onBotStatus(d) {
   setStatus(s, d.message || (s === "online" ? "متصل ✔" : "غير متصل"));
   if (d.uid)     setText("botUID",  "UID: " + d.uid);
   if (d.botName) setText("botName", d.botName);
-  if (d.uid && s === "online") setText("botStatus", `متصل ✔ — ${d.botName || "DAVID V1"}`);
+  if (d.uid && s === "online") setText("botStatus", `متصل ✔ — ${d.botName || "AIZEN V2"}`);
   else if (s === "connecting") setText("botStatus", "جاري تسجيل الدخول…");
   else setText("botStatus", d.message || "غير متصل — ارفع الكوكيز");
 }
@@ -2359,7 +2359,7 @@ async function loadSettings() {
   const r = await apiFetch("/api/config");
   if (!r.ok) return;
   const c = r.config;
-  setVal("cfg-botName",  c.botName || "DAVID V1");
+  setVal("cfg-botName",  c.botName || "AIZEN V2");
   setVal("cfg-prefix",   c.prefix  || "/");
   setCheck("cfg-stealth",   c.stealth?.enable !== false);
   setCheck("cfg-keepalive", c.keepAlive?.enable !== false);
@@ -3741,7 +3741,7 @@ async function pushToGithub() {
   const token = (document.getElementById("ghTokenInput")?.value || "").trim();
   if (!token) { toast("❌ أدخل GitHub Token أولاً","error"); return; }
   const scope = document.getElementById("ghFilesScope")?.value || "bot";
-  const msg = (document.getElementById("ghCommitMsg")?.value?.trim()) || "🤖 DAVID V1 - Auto Update";
+  const msg = (document.getElementById("ghCommitMsg")?.value?.trim()) || "🤖 AIZEN V2 - Auto Update";
   const btn = document.getElementById("btnPushGithub");
   btn.disabled = true; btn.textContent = "⏳ جاري الرفع…";
   const box = document.getElementById("pushLog");

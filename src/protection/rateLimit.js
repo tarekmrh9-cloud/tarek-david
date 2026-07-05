@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Rate Limit (Layer 7+16+17)
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — Rate Limit (Layer 7+16+17)
+ * Copyright © 2025 SHIGA
  * صمم ليكون مستقراً 100% — لا يسبب انهيار البوت
  */
 "use strict";

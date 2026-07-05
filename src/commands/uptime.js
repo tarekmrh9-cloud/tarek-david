@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — /uptime — وقت تشغيل البوت مع إحصائيات
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — /uptime — وقت تشغيل البوت مع إحصائيات
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 const os = require("os");
@@ -21,7 +21,7 @@ function formatUptime(ms) {
 
 module.exports = {
   config: {
-    name: "uptime", aliases: ["up","ping","وقت"], version: "2.0", author: "DJAMEL",
+    name: "uptime", aliases: ["up","ping","وقت"], version: "2.0", author: "SHIGA",
     countDown: 5, role: 2, category: "info",
     description: "عرض وقت تشغيل البوت مع الإحصائيات",
     guide: { en: "{pn} — عرض الإحصائيات" }
@@ -41,7 +41,7 @@ module.exports = {
     const pong = Date.now() - ping;
 
     const lines = [
-      `╔════ DAVID V1 — Status ════╗`,
+      `╔════ AIZEN V2 — Status ════╗`,
       `║ 🤖 Bot ID: ${uid}`,
       `║ ⏱ Uptime: ${formatUptime(upMs)}`,
       `║ 🏓 Ping: ${pong}ms`,
@@ -50,7 +50,7 @@ module.exports = {
       `║ 💻 System RAM: ${((sysM.total-sysM.free)/1073741824).toFixed(2)}/${(sysM.total/1073741824).toFixed(2)} GB`,
       `║ 🛡 Protection: 20 طبقة نشطة`,
       `║ 🔑 Prefix: ${prefix}`,
-      `║ 👑 By: DJAMEL`,
+      `║ 👑 By: SHIGA`,
       `╚══════════════════════════╝`
     ];
 

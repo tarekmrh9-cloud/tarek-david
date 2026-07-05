@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — Command Control (per-thread enable/disable)
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — Command Control (per-thread enable/disable)
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 

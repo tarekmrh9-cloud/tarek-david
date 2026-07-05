@@ -1,7 +1,7 @@
 {
-  "name": "DAVID V1 Bot",
+  "name": "AIZEN V2 Bot",
   "short_name": "DAVID",
-  "description": "DAVID V1 — DjamelBot Engine Dashboard",
+  "description": "AIZEN V2 — DjamelBot Engine Dashboard",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",

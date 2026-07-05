@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — humanTyping Protection Layer
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — humanTyping Protection Layer
+ * Copyright © 2025 SHIGA
  * Non-blocking stub — always safe, never crashes
  */
 "use strict";

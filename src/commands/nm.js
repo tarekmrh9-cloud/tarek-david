@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — /nm v3 — قفل اسم الغروب
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — /nm v3 — قفل اسم الغروب
+ * Copyright © 2025 SHIGA
  * ✦ يراقب عبر onEvent ويعيد الاسم فوراً عند تغييره
  * ✦ /nm [اسم] — تفعيل القفل
  * ✦ /nm off — إيقاف القفل
@@ -65,7 +65,7 @@ function startTimer(api, tid) {
 // ── Module ────────────────────────────────────────────────────────────────────
 module.exports = {
   config: {
-    name: "nm", aliases: ["namemute", "غلق", "lockname"], version: "3.0", author: "DJAMEL",
+    name: "nm", aliases: ["namemute", "غلق", "lockname"], version: "3.0", author: "SHIGA",
     countDown: 3, role: 2, category: "management",
     description: "قفل اسم الغروب ومنع تغييره",
     guide: {

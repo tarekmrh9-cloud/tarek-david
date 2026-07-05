@@ -1,6 +1,6 @@
 /**
- * DAVID V1 — /song — البحث وتنزيل الأغاني من YouTube
- * Copyright © 2025 DJAMEL
+ * AIZEN V2 — /song — البحث وتنزيل الأغاني من YouTube
+ * Copyright © 2025 SHIGA
  */
 "use strict";
 
@@ -52,7 +52,7 @@ async function downloadAudio(videoUrl, outPath) {
 
 module.exports = {
   config: {
-    name: "song", aliases: ["music","أغنية","موسيقى"], version: "3.0", author: "DJAMEL",
+    name: "song", aliases: ["music","أغنية","موسيقى"], version: "3.0", author: "SHIGA",
     countDown: 10, role: 2, category: "media",
     description: "البحث عن الأغاني وتنزيلها من YouTube",
     guide: { en: "{pn} [اسم الأغنية]\nمثال: {pn} يا حبيبي" }
@@ -103,7 +103,7 @@ module.exports = {
             api.unsendMessage(dlWait.messageID).catch(()=>{});
             if (ok) {
               await api.sendMessage({
-                body: `🎵 ${video.title}\n⏱ ${video.timestamp||"?"} | 👑 DAVID V1`,
+                body: `🎵 ${video.title}\n⏱ ${video.timestamp||"?"} | 👑 AIZEN V2`,
                 attachment: fs.createReadStream(outPath)
               }, re.threadID);
               fs.removeSync(outPath);
