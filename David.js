@@ -125,6 +125,7 @@ function startPolling(api, attempt = 1) {
     if (err) {
       const msg = String(err.error || err.message || err);
       log.error("POLL", msg);
+      if (_isLoginBlocked(err)) { _handleLoginBlocked(api, "startPolling"); return; }
       if (attempt < MAX) setTimeout(() => startPolling(api, attempt + 1), attempt * 8000);
       else { log.warn("POLL", "→ Custom Poller"); startPoller(api, handlerEvents, config.pollIntervalMs || 6000); }
       return;
@@ -157,6 +158,7 @@ function startMqtt(api, attempt = 1) {
       clearTimeout(timer);
       const msg = String(err.error || err.message || err.type || err);
       log.warn("MQTT", `${msg} (${attempt}/${MAX})`);
+      if (_isLoginBlocked(err)) { _handleLoginBlocked(api, "startMqtt"); return; }
       if (attempt < MAX) setTimeout(() => startMqtt(api, attempt + 1), Math.min(attempt * 8000, 40000));
       else startPolling(api);
       return;
@@ -221,6 +223,51 @@ function stopProtection() {
   }
 }
 
+// ─── Login Blocked Handler ────────────────────────────────────────────────────────
+const LOGIN_BLOCKED_RETRY_MS = 60 * 60 * 1000; // ساعة كاملة
+let _blockedRetryTimer = null;
+
+function _handleLoginBlocked(api, source) {
+  const io = getIO();
+  log.error("BLOCKED", `🔴 login_blocked من ${source} — الكوكيز محجوبة أو منتهية الصلاحية`);
+  log.warn ("BLOCKED", `⏳ إعادة المحاولة بعد 60 دقيقة. يُنصح برفع كوكيز جديدة من لوحة التحكم.`);
+
+  stopListening();
+  stopProtection();
+  if (io) io.emit("bot-status", {
+    status: "blocked",
+    message: "🔴 login_blocked — الكوكيز منتهية أو محجوبة. ارفع كوكيز جديدة من لوحة التحكم.",
+    retryAfterMs: LOGIN_BLOCKED_RETRY_MS,
+  });
+
+  // إخطار الأدمن إذا كان API متاحاً (ربما تعمل الرسائل رغم حجب MQTT)
+  if (api) {
+    const owners = [
+      ...(config.ownerID ? [config.ownerID] : []),
+      ...(config.adminBot || []),
+      ...(config.superAdminBot || []),
+    ].filter(Boolean);
+    const msg = `🔴 [AIZEN V2] login_blocked\n\nالكوكيز منتهية الصلاحية أو محجوبة من Facebook.\n\n✅ الحل: ارفع كوكيز جديدة من لوحة التحكم\n🔗 ${process.env.RAILWAY_PUBLIC_DOMAIN || "الداشبورد"}\n\n⏳ إعادة المحاولة التلقائية بعد 60 دقيقة`;
+    for (const id of owners) {
+      try { api.sendMessage(msg, String(id)).catch(() => {}); } catch (_) {}
+    }
+  }
+
+  // إعادة المحاولة بعد ساعة
+  if (_blockedRetryTimer) clearTimeout(_blockedRetryTimer);
+  _blockedRetryTimer = setTimeout(() => {
+    _blockedRetryTimer = null;
+    log.info("BLOCKED", "إعادة المحاولة بعد انتظار 60 دقيقة…");
+    startBot();
+  }, LOGIN_BLOCKED_RETRY_MS);
+}
+
+function _isLoginBlocked(err) {
+  if (!err) return false;
+  const s = String(err.error || err.message || err.type || err).toLowerCase();
+  return s.includes("login_blocked") || s.includes("auth_error") || s.includes("checkpoint");
+}
+
 // ─── Login lock ──────────────────────────────────────────────────────────────────
 let _loginLock = false;
 
@@ -275,6 +322,14 @@ async function startBot() {
         const msg = err.message || String(err);
         log.error("LOGIN", `فشل (${attempt}/${MAX_ATTEMPTS}): ${msg}`);
         if (io) io.emit("bot-status", { status: "error", message: `فشل: ${msg}` });
+
+        // login_blocked: لا تُعيد المحاولة فوراً — انتظر ساعة
+        if (_isLoginBlocked(err)) {
+          _loginLock = false;
+          _handleLoginBlocked(null, "tryLogin");
+          return;
+        }
+
         if (attempt < MAX_ATTEMPTS) { setTimeout(tryLogin, attempt * 5000); return; }
         log.error("LOGIN", "وصل لأقصى محاولات");
         if (io) io.emit("bot-status", { status: "offline", message: "فشل تسجيل الدخول" });
