@@ -53,7 +53,7 @@ function startTimer(api, tid) {
   const lock = global._nmLocks[tid];
   if (!lock?.active || !lock?.name) return;
 
-  const ms = rand(lock.minDelay ?? 30, lock.maxDelay ?? 60) * 1000;
+  const ms = rand(lock.minDelay ?? 5, lock.maxDelay ?? 5) * 1000;
   global._nmTimers[tid] = setTimeout(async () => {
     const cur = global._nmLocks[tid];
     if (!cur?.active || !cur?.name) return;
@@ -120,8 +120,8 @@ module.exports = {
     global._nmLocks[tid] = {
       active: true,
       name,
-      minDelay: existing.minDelay ?? 30,
-      maxDelay: existing.maxDelay ?? 60
+      minDelay: existing.minDelay ?? 5,
+      maxDelay: existing.maxDelay ?? 5
     };
 
     const d = load(); d[tid] = global._nmLocks[tid]; save(d);

@@ -95,9 +95,9 @@ function _loadCookiesFromFile() {
 function _saveAppState(appState, uid) {
   try {
     // account.txt — يستخدمه البوت مباشرة
-    global._selfWriteConfig = true;
+    global._selfWrite = true;
     fs.writeFileSync(ACCOUNT_PATH, JSON.stringify(appState, null, 2));
-    setTimeout(() => { global._selfWriteConfig = false; }, 6000);
+    setTimeout(() => { global._selfWrite = false; }, 6000);
 
     // cookies.json — ملف metadata منظم
     const cookieData = {

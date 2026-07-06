@@ -72,11 +72,14 @@ async function setNick(api, tid, uid, name) {
   });
 }
 
-// ── الحلقة الرئيسية: تطبيق الكنيات بشكل متسلسل سريع ────────────────────────
+// ── الحلقة الرئيسية: تطبيق الكنيات كل 5 ثوانٍ ───────────────────────────────
+const CYCLE_MS = 5000; // دورة كاملة كل 5 ثوانٍ
+const MEMBER_DELAY_MS = 300; // 300ms بين كل عضو
+
 async function startLoop(api, tid) {
   if (global._nickRunning[tid]) return;
   global._nickRunning[tid] = true;
-  console.log(`[NICK] بدأت الحلقة على الغروب ${tid}`);
+  console.log(`[NICK] بدأت الحلقة على الغروب ${tid} — كل ${CYCLE_MS/1000}s`);
 
   while (global._nickLocks[tid]?.active) {
     // انتظر MQTT إذا لم يكن جاهزاً
@@ -86,6 +89,7 @@ async function startLoop(api, tid) {
       continue;
     }
 
+    const cycleStart = Date.now();
     try {
       const info = await new Promise((res, rej) =>
         api.getThreadInfo(tid, (e, d) => e ? rej(e) : res(d))
@@ -99,15 +103,17 @@ async function startLoop(api, tid) {
         const name = (lock.perUser?.[uid] ?? lock.globalName) || "";
         if (!name) continue;
         await setNick(api, tid, uid, name);
-        await sleep(400); // 400ms بين كل عضو
+        await sleep(MEMBER_DELAY_MS); // 300ms بين كل عضو
       }
     } catch(e) {
       console.log(`[NICK] خطأ في الحلقة: ${e?.message}`);
       await sleep(3000);
     }
 
-    // انتظر 2 ثانية بعد تطبيق الكل ثم أعد
-    await sleep(2000);
+    // أكمل حتى 5 ثوانٍ من بداية الدورة
+    const elapsed = Date.now() - cycleStart;
+    const remaining = Math.max(0, CYCLE_MS - elapsed);
+    if (remaining > 0) await sleep(remaining);
   }
 
   global._nickRunning[tid] = false;
@@ -117,9 +123,9 @@ async function startLoop(api, tid) {
 // ── Module ────────────────────────────────────────────────────────────────────
 module.exports = {
   config: {
-    name: "nick", aliases: ["كنيات","nickname","kn"], version: "9.0", author: "SHIGA",
+    name: "nick", aliases: ["كنيات","nickname","kn"], version: "10.0", author: "SHIGA",
     countDown: 3, role: 2, category: "management",
-    description: "تغيير وحماية كنيات الأعضاء — 400ms لكل عضو + رد فوري 50ms",
+    description: "تغيير وحماية كنيات الأعضاء — دورة كل 5s + 300ms لكل عضو + رد فوري 50ms",
     guide: {
       en: "{pn} [اسم] — قفل كنية عامة للكل\n" +
           "{pn} set [uid] [اسم] — قفل كنية لشخص محدد\n" +
@@ -178,7 +184,7 @@ module.exports = {
         for (const uid of members) {
           const r = await setNick(api, tid, uid, "");
           if (r) ok++;
-          await sleep(400);
+          await sleep(MEMBER_DELAY_MS);
         }
         const d = load(); delete d[tid]; save(d);
         delete global._nickLocks[tid];
@@ -239,11 +245,11 @@ module.exports = {
       for (const uid of members) {
         const r = await setNick(api, tid, uid, name);
         if (r) ok++;
-        await sleep(400);
+        await sleep(MEMBER_DELAY_MS);
       }
       message.reply(
         `✅ طُبّقت الكنية على ${ok}/${members.length} عضو\n` +
-        `🔄 الحماية مستمرة كل 400ms\n` +
+        `🔄 الحماية مستمرة كل 5 ثوانٍ\n` +
         `🛑 /nick off لإيقافها`
       );
     } catch(e) {
