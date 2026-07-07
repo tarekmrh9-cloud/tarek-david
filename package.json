@@ -15,6 +15,7 @@
     "@anthropic-ai/sdk": "^0.104.1",
     "@dongdev/fca-unofficial": "*",
     "axios": "^1.16.1",
+    "better-sqlite3": "^9.6.0",
     "body-parser": "^1.20.5",
     "chalk": "^4.1.2",
     "express": "^4.22.2",

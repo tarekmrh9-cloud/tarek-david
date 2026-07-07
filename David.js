@@ -279,6 +279,23 @@ async function startBot() {
   stopListening();
   stopProtection();
 
+  // ── إلغاء مؤقت الحظر المعلق إن وُجد ────────────────────────────────────────
+  if (_blockedRetryTimer) { clearTimeout(_blockedRetryTimer); _blockedRetryTimer = null; }
+
+  // ── تنظيف حالة الجلسة القديمة ────────────────────────────────────────────────
+  // إيقاف جميع timers القديمة لـ angel و divel
+  for (const tid of Object.keys(global.GoatBot?.angelIntervals || {})) {
+    try { clearTimeout(global.GoatBot.angelIntervals[tid]); } catch (_) {}
+  }
+  if (global.GoatBot) {
+    global.GoatBot.angelIntervals   = {};
+    global.GoatBot._angelRestored   = false;
+    global.GoatBot._divelRestored   = false;
+    global.GoatBot.divelWatchers    = {};
+  }
+  global._nmRestored   = false;
+  global._nickRunning  = {};
+
   global.GoatBot.fcaApi = null;
   global.GoatBot.botID  = null;
   global.api            = null;
@@ -286,7 +303,8 @@ async function startBot() {
   if (io) io.emit("bot-status", { status: "connecting", uid: null });
 
   // قراءة الكوكيز
-  if (!fs.existsSync(ACCOUNT_PATH)) fs.writeFileSync(ACCOUNT_PATH, "", "utf8");
+  try { if (!fs.existsSync(ACCOUNT_PATH)) fs.writeFileSync(ACCOUNT_PATH, "", "utf8"); }
+  catch (_) {}
   const rawCookie = fs.readFileSync(ACCOUNT_PATH, "utf8").trim();
 
   if (!rawCookie) {

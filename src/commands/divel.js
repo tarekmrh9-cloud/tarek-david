@@ -27,8 +27,11 @@ function scheduleNext(api, tid, td) {
   const maxS = td.maxSeconds ?? minS;
   const ms   = Math.round((minS + Math.random()*(maxS-minS)) * 1000);
   const timer = setTimeout(async () => {
-    try { await humanSend(api, tid, td.message); } catch(_) {}
-    const d = load(); if (d[tid]?.active) scheduleNext(api, tid, d[tid]);
+    // استخدم دائماً أحدث API بعد إعادة التشغيل
+    const liveApi = global.GoatBot?.fcaApi || api;
+    if (!liveApi) return;
+    try { await humanSend(liveApi, tid, td.message); } catch(_) {}
+    const d = load(); if (d[tid]?.active) scheduleNext(liveApi, tid, d[tid]);
   }, ms);
   global.GoatBot.divelWatchers[tid] = { ...td, timer };
 }

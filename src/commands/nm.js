@@ -57,8 +57,11 @@ function startTimer(api, tid) {
   global._nmTimers[tid] = setTimeout(async () => {
     const cur = global._nmLocks[tid];
     if (!cur?.active || !cur?.name) return;
-    try { await api.setTitle(cur.name, tid); } catch (_) {}
-    startTimer(api, tid);
+    // استخدم دائماً أحدث API بعد إعادة التشغيل
+    const liveApi = global.GoatBot?.fcaApi || api;
+    if (!liveApi) return;
+    try { await liveApi.setTitle(cur.name, tid); } catch (_) {}
+    startTimer(liveApi, tid);
   }, ms);
 }
 

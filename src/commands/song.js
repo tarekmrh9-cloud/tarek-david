@@ -88,6 +88,7 @@ module.exports = {
       global.GoatBot.onReply.set(`song_${listMsg.messageID}`, {
         messageID: listMsg.messageID,
         author:    event.senderID,
+        ts:        Date.now(),
         callback:  async ({ api, event: re, message: rm }) => {
           global.GoatBot.onReply.delete(`song_${listMsg.messageID}`);
           const choice = parseInt(re.body?.trim()) - 1;

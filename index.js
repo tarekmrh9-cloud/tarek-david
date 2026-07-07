@@ -33,9 +33,8 @@ function start() {
   log(`تشغيل AIZEN V2... (محاولة ${restarts})`);
 
   child = spawn(process.execPath, [
-    "--max-old-space-size=400",
+    "--max-old-space-size=1024",
     "--gc-interval=100",
-    "--optimize-for-size",
     path.join(__dirname, "David.js"),
   ], {
     stdio: "inherit",

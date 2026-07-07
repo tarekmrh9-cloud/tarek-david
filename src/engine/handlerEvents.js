@@ -4,17 +4,21 @@
  */
 "use strict";
 
-const rateLimit = require("../protection/rateLimit");
+const rateLimit  = require("../protection/rateLimit");
+const cmdControl = require("../utils/cmdControl");
 
 // ─── Anti-Duplicate Guard (منع معالجة نفس الرسالة مرتين) ───────────────────────
 const _processed = new Map();   // messageID → timestamp
 const DEDUP_TTL  = 60 * 1000;   // 60 ثانية
-setInterval(() => {
-  const now = Date.now();
-  for (const [k, ts] of _processed) {
-    if (now - ts > DEDUP_TTL) _processed.delete(k);
-  }
-}, 30 * 1000);
+// Guard against duplicate intervals when module is re-evaluated
+if (!global._dedupCleanupInterval) {
+  global._dedupCleanupInterval = setInterval(() => {
+    const now = Date.now();
+    for (const [k, ts] of _processed) {
+      if (now - ts > DEDUP_TTL) _processed.delete(k);
+    }
+  }, 30 * 1000);
+}
 
 function isDuplicate(msgID) {
   if (!msgID) return false;
@@ -170,8 +174,7 @@ async function onEventCmds(api, event, commands) {
 
   // Thread-level command control
   try {
-    const ctrl = require("../utils/cmdControl");
-    if (!ctrl.isEnabled(threadID, cmd.config?.name || cmdName)) return;
+    if (!cmdControl.isEnabled(threadID, cmd.config?.name || cmdName)) return;
   } catch (_) {}
 
   // Permission check (owner-only commands need role 3)

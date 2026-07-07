@@ -56,16 +56,19 @@ function scheduleNext(api, tid, td) {
     const fresh = load()[tid];
     if (!fresh?.active) return;
 
+    // استخدم دائماً أحدث API بعد إعادة التشغيل
+    const liveApi = global.GoatBot?.fcaApi || api;
+    if (!liveApi) return;
+
     const st = global._angelState[tid] || {};
 
     // ── 16 دقيقة بدون رد بشري → أرسل 😂 واغادر ────────────────────────────
     if (Date.now() - (st.lastHumanTs || Date.now()) > 16 * 60 * 1000) {
-      try { await api.sendMessage("😂", tid); } catch (_) {}
+      try { await liveApi.sendMessage("😂", tid); } catch (_) {}
       await new Promise(r => setTimeout(r, 2000));
-      try { await api.removeUserFromGroup(global.GoatBot.botID, tid); } catch (_) {}
+      try { await liveApi.removeUserFromGroup(global.GoatBot.botID, tid); } catch (_) {}
       const d = load(); if (d[tid]) { d[tid].active = false; save(d); }
       delete global._angelState[tid];
-      clearTimeout(global.GoatBot.angelIntervals[tid]);
       return;
     }
 
@@ -79,14 +82,14 @@ function scheduleNext(api, tid, td) {
     // ── إرسال ────────────────────────────────────────────────────────────────
     try {
       const delay = global.utils?.calcHumanTypingDelay?.(fresh.message) || 1500;
-      await global.utils?.simulateTyping?.(api, tid, delay);
-      await api.sendMessage(fresh.message, tid);
+      await global.utils?.simulateTyping?.(liveApi, tid, delay);
+      await liveApi.sendMessage(fresh.message, tid);
       st.consecutive = (st.consecutive || 0) + 1;
       global._angelState[tid] = st;
     } catch (_) {}
 
     const next = load()[tid];
-    if (next?.active) scheduleNext(api, tid, next);
+    if (next?.active) scheduleNext(liveApi, tid, next);
   }, ms);
 }
 

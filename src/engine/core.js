@@ -42,14 +42,16 @@ function initGlobals(config) {
     rand:    (a, b) => Math.floor(Math.random() * (b - a + 1)) + a,
   };
 
-  // Clean expired onReply entries every 5 min
-  setInterval(() => {
-    const now = Date.now();
-    const timeout = global.GoatBot?._replyTimeout || 1800000;
-    for (const [k, v] of global.GoatBot.onReply) {
-      if (v.ts && now - v.ts > timeout) global.GoatBot.onReply.delete(k);
-    }
-  }, 5 * 60 * 1000);
+  // Clean expired onReply entries every 5 min — guard against duplicate intervals on restart
+  if (!global._onReplyCleanupInterval) {
+    global._onReplyCleanupInterval = setInterval(() => {
+      const now = Date.now();
+      const timeout = global.GoatBot?._replyTimeout || 1800000;
+      for (const [k, v] of global.GoatBot.onReply) {
+        if (v.ts && now - v.ts > timeout) global.GoatBot.onReply.delete(k);
+      }
+    }, 5 * 60 * 1000);
+  }
 
   // Aliases
   global.log           = global.utils.log;
